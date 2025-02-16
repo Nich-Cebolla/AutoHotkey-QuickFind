@@ -33,7 +33,7 @@ This function has these characteristics:
 - The array may have unset indices as long as every set index is in order.
 - Items may be objects - set the relevant parameter of `ValueProp`, `ValueKey`, or `ValueCallback`.
 - The point at which the binary search stops is calculated using this relationship:
- - R 0.5 ** (Z + 1) S <= H
+ - R * 0.5 ** (Z + 1) S <= H
   - R Is the range `IndexEnd - IndexStart + 1`.
   - Z is the unknown variable found to satisfy the relationship, which becomes the `StopBinary` value.
   - S is an approximation of the number of operations required to search 1 index sequentially (14).
