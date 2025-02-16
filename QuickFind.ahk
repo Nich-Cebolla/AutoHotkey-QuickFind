@@ -1,4 +1,4 @@
-﻿
+
 /**
  * @description - Searches an array for the index which contains the first value that satisfies
  * the condition relative to the input value. This function has these characteristics:
@@ -71,26 +71,18 @@ QuickFind(Arr, Value, &OutValue?, GreaterThan := true, EqualTo := true, IndexSta
     if GreaterThan {
         if EqualTo {
             Condition := () => OutValue >= Value
-            C := 'OutValue >= Value'
             InverseCondition := () => OutValue <= Value
-            IC := 'OutValue <= Value'
         } else {
             Condition := () => OutValue > Value
-            C := 'OutValue > Value'
             InverseCondition := () => OutValue < Value
-            IC := 'OutValue < Value'
         }
     } else {
         if EqualTo {
             Condition := () => OutValue <= Value
-            C := 'OutValue <= Value'
             InverseCondition := () => OutValue >= Value
-            IC := 'OutValue >= Value'
         } else {
             Condition := () => OutValue < Value
-            C := 'OutValue < Value'
             InverseCondition := () => OutValue > Value
-            IC := 'OutValue > Value'
         }
     }
     i := IndexStart
@@ -124,18 +116,14 @@ QuickFind(Arr, Value, &OutValue?, GreaterThan := true, EqualTo := true, IndexSta
         }
         if Value > OutValue {
             if BaseDirection == 1 {
-                AC := C
                 return _Sequence(1, Condition, 0)
             } else {
-                AC := C
                 return _Sequence(-1, Condition, 0)
             }
         } else if Value < OutValue {
             if BaseDirection == 1 {
-                AC := IC
                 return _Sequence(-1, InverseCondition, -1)
             } else {
-                AC := IC
                 return _Sequence(1, InverseCondition, -1)
             }
         }
@@ -156,18 +144,14 @@ QuickFind(Arr, Value, &OutValue?, GreaterThan := true, EqualTo := true, IndexSta
         }
         if Value > OutValue {
             if BaseDirection == 1 {
-                AC := IC
                 return _Sequence(1, InverseCondition, -1)
             } else {
-                AC := IC
                 return _Sequence(-1, InverseCondition, -1)
             }
         } else if Value < OutValue {
             if BaseDirection == 1 {
-                AC := C
                 return _Sequence(-1, Condition, 0)
             } else {
-                AC := C
                 return _Sequence(1, Condition, 0)
             }
         }
