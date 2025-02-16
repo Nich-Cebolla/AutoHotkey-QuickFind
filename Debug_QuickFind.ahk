@@ -1,4 +1,4 @@
-﻿
+
 /**
  * @description - Searches an array for the index which contains the first value that satisfies
  * the condition relative to the input value. This function has these characteristics:
