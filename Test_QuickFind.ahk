@@ -1,5 +1,6 @@
-﻿
+
 #Include ..\Object.Prototype\Object.Prototype.Stringify.ahk
+; https://github.com/Nich-Cebolla/Stringify-ahk/blob/main/Object.Stringify.ahk
 #Include QuickFind.ahk
 
 test()
