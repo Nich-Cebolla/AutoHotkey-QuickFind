@@ -34,7 +34,7 @@ QuickFind(Arr, Value, &OutValue?, GreaterThan := true, EqualTo := true, IndexSta
 , ValueProp?, ValueKey?, ValueCallback?) {
     local i
     ; If you have a need for the binary search to cease early, set the value here.
-    StopBinary := unset
+    ; StopBinary := unset
     if !Arr.Length
         throw Error('The array is empty.', -1)
     if IsSet(ValueProp) {
