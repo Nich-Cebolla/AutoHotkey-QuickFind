@@ -6,7 +6,9 @@ This function performs a binary search on a sorted array, returning the index of
 
 A binary search is optimal when there is little information known about the value that is being searched for and the distribution of values in the array, as this will, on average, require much less processing time to identify the needed value compared to a sequential search. It's also ideal for situations when the benefit for writing code that analyzes and responds to an array's current distribution of values outweighs the cost of writing and maintaining that code, because this will consistently require a small bit of processing time to perform its function, even on very large arrays.
 
-## AutoHotkey Forum Link
+Within the file `QuickFind_CharExample.ahk` you will find an example of how to use `QuickFind` to search for a word in an array sorted alphabetically.
+
+### AutoHotkey Forum Link
 https://www.autohotkey.com/boards/viewtopic.php?f=83&t=135897
 
 ## Parameters
@@ -34,12 +36,12 @@ This function has these characteristics:
 - The array may have unset indices as long as every set index is in order.
 - Items may be objects - set the relevant parameter of `ValueProp`, `ValueKey`, or `ValueCallback`.
 - The point at which the binary search stops is calculated using this relationship:
-  - R * 0.5 ** (Z + 1) S <= H
-    - R Is the range `IndexEnd - IndexStart + 1`.
-    - Z is the unknown variable found to satisfy the relationship, which becomes the `StopBinary` value.
-    - S is an approximation of the number of operations required to search 1 index sequentially (14).
-    - H is an approximation of the number of operations required to halve the range (27).
-  - This relationship assumes each operation is atomic. Passing a value to a function is counted as an operation.
+ - `R * 0.5 ** (Z + 1) * S <= H`
+  - R Is the range `IndexEnd - IndexStart + 1`.
+  - Z is the unknown variable found to satisfy the relationship, which becomes the `StopBinary` value.
+  - S is an approximation of the number of operations required to search 1 index sequentially (14).
+  - H is an approximation of the number of operations required to halve the range (27).
+ - This relationship assumes each operation is atomic. Passing a value to a function is counted as an operation.
 
 ## Contents
 
@@ -52,6 +54,16 @@ A comprehensive validation test for `QuickFind`.
 ### Debug_QuickFind.ahk
 A debug version of `QuickFind`, intended to be used with `Test_QuickFind.ahk` (don't forget to change the #Include statement).
 
-## Changelog
+### QuickFind_CharExample.ahk
+Demonstrates how to use `QuickFind` to search for a word in an array sorted alphabetically.
+
+### Words.ahk
+Contains an array of words sorted alphabetically.
+
+### Changelog
+2025-02-23
+- Added `QuickFind_CharExample.ahk`
+- Standardized what value is received by `OutValue`. Previously, I had overlooked this and sometimes it received the unmodified value from the array, and sometimes it received the value after it was processed by `GetValue`. Now, it always receives the unmodified value.
+
 2025-02-16
 - Uploaded library
