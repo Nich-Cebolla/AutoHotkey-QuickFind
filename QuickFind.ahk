@@ -183,6 +183,7 @@ QuickFind(Arr, Value, &OutValue?, GreaterThan := true, EqualTo := true, IndexSta
                 if GetNearest(Direction) || i > IndexEnd || i < IndexStart
                     return OutValue := ''
             }
+            OutValue := Arr[i]
             return i
         }
     }
@@ -219,16 +220,19 @@ QuickFind(Arr, Value, &OutValue?, GreaterThan := true, EqualTo := true, IndexSta
                 return _HandleEqualValues()
             }
             if Condition() {
-                if OutValue == Value
+                if OutValue == Value {
+                    OutValue := Arr[i]
                     return i
+                }
                 if ReturnWhat == -1 {
                     if IsSet(Previous) {
-                        OutValue := GetValue(Arr[Previous])
+                        OutValue := Arr[Previous]
                         return Previous
                     } else {
                         return _FindNext(Direction * -1)
                     }
                 } else {
+                    OutValue := Arr[i]
                     return i
                 }
             }
@@ -243,11 +247,10 @@ QuickFind(Arr, Value, &OutValue?, GreaterThan := true, EqualTo := true, IndexSta
                     return OutValue := ''
                 }
                 if Arr.Has(i) {
-                    OutValue := GetValue(Arr[i])
+                    OutValue := Arr[i]
                     return i
                 }
             }
         }
     }
 }
-
