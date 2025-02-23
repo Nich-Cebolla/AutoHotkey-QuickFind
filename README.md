@@ -36,12 +36,12 @@ This function has these characteristics:
 - The array may have unset indices as long as every set index is in order.
 - Items may be objects - set the relevant parameter of `ValueProp`, `ValueKey`, or `ValueCallback`.
 - The point at which the binary search stops is calculated using this relationship:
- - `R * 0.5 ** (Z + 1) * S <= H`
-  - R Is the range `IndexEnd - IndexStart + 1`.
-  - Z is the unknown variable found to satisfy the relationship, which becomes the `StopBinary` value.
-  - S is an approximation of the number of operations required to search 1 index sequentially (14).
-  - H is an approximation of the number of operations required to halve the range (27).
- - This relationship assumes each operation is atomic. Passing a value to a function is counted as an operation.
+  - `R * 0.5 ** (Z + 1) * S <= H`
+    - R Is the range `IndexEnd - IndexStart + 1`.
+    - Z is the unknown variable found to satisfy the relationship, which becomes the `StopBinary` value.
+    - S is an approximation of the number of operations required to search 1 index sequentially (14).
+    - H is an approximation of the number of operations required to halve the range (27).
+  - This relationship assumes each operation is atomic. Passing a value to a function is counted as an operation.
 
 ## Contents
 
@@ -60,7 +60,7 @@ Demonstrates how to use `QuickFind` to search for a word in an array sorted alph
 ### Words.ahk
 Contains an array of words sorted alphabetically.
 
-### Changelog
+## Changelog
 2025-02-23
 - Added `QuickFind_CharExample.ahk`
 - Standardized what value is received by `OutValue`. Previously, I had overlooked this and sometimes it received the unmodified value from the array, and sometimes it received the value after it was processed by `GetValue`. Now, it always receives the unmodified value.
