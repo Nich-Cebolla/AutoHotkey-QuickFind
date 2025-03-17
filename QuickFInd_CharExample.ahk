@@ -2,23 +2,12 @@
 #Include QuickFind.ahk
 #Include Words.ahk
 
+GetWordValue := QuickFind.GetWordValueFunc
 Index := QuickFind(Words, GetWordValue('coincide'), &WordValue, , , , , , , GetWordValue)
 MsgBox('Index: ' Index ' Value: ' WordValue) ; Index: 86 Value: coincide
 Index := QuickFind(Words, GetWordValue('counter'), &WordValue, true, , , , , , GetWordValue)
 MsgBox('Index: ' Index ' Value: ' WordValue) ; Index: 110 Value: cow
 
-GetWordValue(W) {
-    n := 0
-    for c in StrSplit(StrUpper(W)) {
-        if Ord(c) >= 123
-            n += (Ord(c) - 58) / 68 ** A_Index
-        else
-            n += (Ord(c) - 32) / 68 ** A_Index
-        if A_Index >= 10 ; Accuracy is lost around 10 characters.
-            break
-    }
-    return n
-}
 
 /*
 Explanation:
