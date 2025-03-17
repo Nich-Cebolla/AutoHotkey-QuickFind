@@ -1,11 +1,17 @@
 
-#Include ..\Object.Prototype\Object.Prototype.Stringify.ahk
+#Include <Object.Prototype.Stringify_V1.0.0>
 ; https://github.com/Nich-Cebolla/Stringify-ahk/blob/main/Object.Stringify.ahk
 #Include QuickFind.ahk
 
-test()
+test(2)
 
-test() {
+/**
+ * @description - Initiates the test.
+ * @param {Integer} [Which=1] - One of the following options:
+ * - 1: Test `QuickFind.Call`
+ * - 2: Test `QuickFind.GetFunc.Prototype.Call`
+ */
+test(Which := 1) {
     global F
     local ArrClone
     G := Gui()
@@ -79,6 +85,7 @@ test() {
                                 Process(Arr, V)
                             catch Error as err {
                                 if err.Message == 'The end index is less than or equal to the start index.'
+                                || 'The range does not contain a value.'
                                     continue
                                 else
                                     throw err
@@ -299,7 +306,12 @@ test() {
     }
     MsgBox('Success!')
     Process(ArrClone, V) {
-        return QuickFind(ArrClone, V.Value, &OutValue, Input.GT, Input.ET, Input.INS, Input.INE)
+        switch Which {
+            case 1: return QuickFind(ArrClone, V.Value, &OutValue, Input.GT, Input.ET, Input.INS, Input.INE)
+            case 2:
+                Fn := QuickFind.Func(ArrClone, Input.GT, Input.ET, Input.INS, Input.INE)
+                return Fn(V.Value, &OutValue)
+        }
     }
     GetValue(i) {
         ; return i * 2 + Round(Random(), 3) - 5000
