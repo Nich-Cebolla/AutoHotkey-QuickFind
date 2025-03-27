@@ -178,7 +178,7 @@ class Test_QuickFind {
                     this.Problem.Push(O := _Obj(FoundValue??'', Result))
                     this.UpdateDisplay(O)
                     this.G['TxtTotal_Problem'].Text := this.Problem.Length
-                    if qf_debug.HasOwnProp('lines') && qf_debug.lines is Array {
+                    if qf_debug.HasOwnProp('lines') && qf_debug.lines is Array && qf_debug.lines.Length {
                         this.WriteDebug()
                     }
                     qf_debug.pause := true
@@ -207,7 +207,10 @@ class Test_QuickFind {
                 if Which == 1 {
                     return QuickFind(TA, GetValue(FI), &FoundValue, Condition, B.Start, B.End)
                 } else {
-                    return QuickFind.Func(TA, Condition, B.Start, B.End)(GetValue(FI), &FoundValue)
+                    Finder := QuickFind.Func(TA, Condition, B.Start, B.End)
+                    Result := Finder(GetValue(FI), &FoundValue)
+                    Finder.Dispose()
+                    return Result
                 }
             }
             _Obj(FoundValue, Result) => { i: i.Clone(), FoundIndex: Result, ExpectedIndex: ExpectedIndex, Arr: _CopyArray()
@@ -599,47 +602,13 @@ class Test_QuickFind {
 
         HClickCheckboxDebug(Ctrl, *) {
             global qf_debug, qf_debug_file
-            if IsSet(qf_debug_file) {
-                if Ctrl.Value {
-                    qf_debug.lines := []
-                    qf_debug.lines.Capacity := 1000
-                    this.ShowTooltip('Debug on!')
-                } else {
-                    qf_debug.lines := ''
-                    this.ShowTooltip('Debug off!')
-                }
+            if Ctrl.Value {
+                qf_debug.lines := []
+                qf_debug.lines.Capacity := 1000
+                this.ShowTooltip('Debug on!')
             } else {
-                if Ctrl.Value {
-                    static Url := 'https://github.com/Nich-Cebolla/AutoHotkey-QuickFind/blob/main/Debug_QuickFind.ahk'
-                    if !this.HasOwnProp('DG') {
-                        _MakeDG()
-                    } else {
-                        try {
-                            if WinExist(this.DG.Hwnd) {
-                                this.DG.Show()
-                            }
-                        } catch {
-                            _MakeDG()
-                        }
-                    }
-                } else {
-                    try {
-                        if WinExist(this.DG.Hwnd) {
-                            this.DG.Hide()
-                        }
-                    }
-                }
-            }
-            HClickLinkDebugfile(*) {
-                Run(Url)
-            }
-            _MakeDG() {
-                DG := this.DG := Gui('+Owner +Resize -DPIScale')
-                DG.SetFont('s11')
-                DG.Add('Text', 'Section', 'The debug version of ``QuickFind.ahk`` is not active. You can download it here:')
-                DG.Add('Link', 'xs', '<a id="' url '">'
-                url '</a>').OnEvent('Click', HClickLinkDebugfile)
-                DG.Show()
+                qf_debug.lines := ''
+                this.ShowTooltip('Debug off!')
             }
         }
 
@@ -889,4 +858,3 @@ class Test_QuickFind {
       , 'Searches for the value at the indicated index, and the value absent from the array.'
     ]
 }
-
