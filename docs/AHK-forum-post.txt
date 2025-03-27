@@ -184,11 +184,16 @@ MsgBox(LastIndex) ; 4
 [code]
 #Include QuickFind.ahk
 #Include Words.ahk
-GetWordValue := QuickFind.GetWordValueFunc
-Index := QuickFind(Words, GetWordValue('coincide'), &WordValue, , , , , , , GetWordValue)
+
+GetWordValue := ObjBindMethod(QuickFind, 'GetWordValue', true) ; true to use cache
+; or
+; GetWordValue := ObjBindMethod(QuickFind, 'GetWordValue', false) ; false to not use cache
+
+Index := QuickFind(Words, GetWordValue('coincide'), &WordValue, , , , GetWordValue)
 MsgBox('Index: ' Index ' Value: ' WordValue) ; Index: 86 Value: coincide
-Index := QuickFind(Words, GetWordValue('counter'), &WordValue, true, , , , , , GetWordValue)
+Index := QuickFind(Words, GetWordValue('counter'), &WordValue, '>=', , , GetWordValue)
 MsgBox('Index: ' Index ' Value: ' WordValue) ; Index: 110 Value: cow
+
 /*
 Explanation:
 The printable character range is 33 - 126.
