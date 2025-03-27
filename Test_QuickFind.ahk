@@ -3,9 +3,12 @@
 ; https://github.com/Nich-Cebolla/Stringify-ahk/blob/main/Object.Stringify.ahk
 #Include <Align_V1.0.0>
 ; https://github.com/Nich-Cebolla/AutoHotkey-LibV2/blob/main/Align.ahk
-#Include QuickFind Copy.ahk
+#Include QuickFind.ahk
 #SingleInstance force
 Test_QuickFind()
+
+global qf_debug := { pause: false, lines: [] }
+qf_debug.lines.Capacity := 100
 
 /**
  * @description - Initiates the test.
@@ -15,7 +18,7 @@ Test_QuickFind()
  */
 class Test_QuickFind {
 
-    static BtnCtrlNames := ['Start', 'Pause', 'Stop', 'Exit', 'Reload', 'Clear', 'EqualTo']
+    static BtnCtrlNames := ['Start', 'Pause', 'Stop', 'Exit', 'Reload', 'Clear', 'Equality', 'ListLines']
     , GreaterThan := [false, true]
     , EqualTo := [false, true]
 
@@ -28,6 +31,7 @@ class Test_QuickFind {
     static Paused := 0
     , Stop := 0
     , Init := 0
+    , Finished := 0
 
     static __New() {
         FindIndices := this.FindIndices := [1, 2, 3, 4, 5, 9, 10, 11, 499, 500, 501, 989, 990, 991
@@ -71,12 +75,13 @@ class Test_QuickFind {
 
     static Call(Which := 1) {
         static i, TA, GT, ET, B, FI
+        global debug_pause
         if !this.HasOwnProp('G') {
             this.CreateGui()
         }
         if this.Paused {
             this.Paused := 0
-            Process_Loop()
+            Process_Loop(Which)
         } else {
             this.i := { find: 1, gt: 1, et: 1, bounds: 1, array: 1, fn: 1, count: 0 }
             this.Result := []
@@ -85,27 +90,30 @@ class Test_QuickFind {
             if !this.Init {
                 this.Init := 1
                 n := 0
-                loop {
-                    try {
-                        this.Functions.Push(Process_%(++n)%)
-                    } catch {
-                        break
+                if !this.Functions.Length {
+                    loop {
+                        try {
+                            this.Functions.Push(Process_%(++n)%)
+                        } catch {
+                            break
+                        }
                     }
                 }
                 static TAS := this.TestArrays, GTS := this.GreaterThan, ETS := this.EqualTo
                 , BS := this.Bounds, FIS := this.FindIndices, FNS := this.Functions
                 return
             } else {
-                Process_Loop()
+                Process_Loop(Which)
             }
         }
         if this.Stop {
             this.Stop := this.Paused := 0
         } else if !this.Paused {
             this.ShowTooltip('Done')
+            this.Finished := 1
         }
 
-        Process_Loop() {
+        Process_Loop(Which) {
             i := this.i
             Result := this.Result
             G := this.G
@@ -128,7 +136,7 @@ class Test_QuickFind {
                                     if this.Paused || this.Stop {
                                         return
                                     }
-                                    FNS[i.fn]()
+                                    FNS[i.fn](Which)
                                     i.count++
                                     i.fn++
                                 }
@@ -151,22 +159,56 @@ class Test_QuickFind {
         /**
          * @description - A wrapper for calling the functions and storing the results.
          */
-        Process_Main(ExpectedIndex, ExpectedValue, LineNumber) {
-            if Which == 1 {
-                Result := QuickFind(TA, GetValue(FI), &FoundValue, GT, ET, B.Start, B.End)
+        Process_Main(Which, ExpectedIndex, ExpectedValue, LineNumber) {
+            if GT {
+                if ET {
+                    Condition := '>='
+                } else {
+                    Condition := '>'
+                }
             } else {
-                Result := QuickFind.Func(TA, GT, ET, B.Start, B.End)(GetValue(FI), &FoundValue)
+                if ET {
+                    Condition := '<='
+                } else {
+                    Condition := '<'
+                }
             }
-            if Result !== ExpectedIndex || (FoundValue??'') !== ExpectedValue {
-                this.Problem.Push(O := _Obj())
-                this.G['TxtTotal_Problem'].Text := this.Problem.Length
+            if this.G['ChkDebug'].Value {
+                Result := _GetResult(&FoundValue)
+                if Result !== ExpectedIndex || (FoundValue??'') !== ExpectedValue {
+                    this.Problem.Push(O := _Obj(FoundValue??'', Result))
+                    this.UpdateDisplay(O)
+                    this.G['TxtTotal_Problem'].Text := this.Problem.Length
+                    ; Place breakpoint to go back into function.
+                    qf_debug.pause := true
+                    Result := _GetResult(&FoundValue)
+                    if qf_debug.pause {
+                        qf_debug.pause := false
+                    }
+                } else {
+                    this.Result.Push(_Obj(FoundValue??'', Result))
+                    this.G['TxtTotal_Result'].Text := this.Result.Length
+                }
             } else {
-                this.Result.Push(_Obj())
-                this.G['TxtTotal_Result'].Text := this.Result.Length
+                Result := _GetResult(&FoundValue)
+                if Result !== ExpectedIndex || (FoundValue??'') !== ExpectedValue {
+                    this.Problem.Push(O := _Obj(FoundValue??'', Result))
+                    this.G['TxtTotal_Problem'].Text := this.Problem.Length
+                } else {
+                    this.Result.Push(_Obj(FoundValue??'', Result))
+                    this.G['TxtTotal_Result'].Text := this.Result.Length
+                }
             }
 
-            _Obj() => { i: i.Clone(), FoundIndex: Result, ExpectedIndex: ExpectedIndex, Arr: _CopyArray()
-            , FindValue: GetValue(FI), FindIndex: FI, FoundValue: (FoundValue??''), ExpectedValue: ExpectedValue
+            _GetResult(&FoundValue) {
+                if Which == 1 {
+                    return QuickFind(TA, GetValue(FI), &FoundValue, Condition, B.Start, B.End)
+                } else {
+                    return QuickFind.Func(TA, Condition, B.Start, B.End)(GetValue(FI), &FoundValue)
+                }
+            }
+            _Obj(FoundValue, Result) => { i: i.Clone(), FoundIndex: Result, ExpectedIndex: ExpectedIndex, Arr: _CopyArray()
+            , FindValue: GetValue(FI), FindIndex: FI, FoundValue: FoundValue, ExpectedValue: ExpectedValue
             , LineNumber: LineNumber }
         }
         GetValue(Index) => i.array == 1 ? Index - 501 : 501 - Index
@@ -175,7 +217,7 @@ class Test_QuickFind {
          * @description - Searches for the value at the indicated index, and the value is present
          * at the index.
          */
-        Process_1() {
+        Process_1(Which) {
             k := FI - 2
             loop 3 {
                 if ++k < 1 || k > this.Len {
@@ -186,36 +228,36 @@ class Test_QuickFind {
             if ET {
                 ; The loop skips cases where FI > B.End  || FI < B.Start. Consequently,
                 ; when ET is true, the function will always find the value in this block.
-                Process_Main(FI, GetValue(FI), A_LineNumber)
+                Process_Main(Which, FI, GetValue(FI), A_LineNumber)
             } else {
                 ; If ET is false, the function fails to find the value when FI - 1 < B.Start || FI + 1 > B.End
                 ; depending on the direction fo the array and whether GT is true.
                 if GT {
                     if i.array == 1 { ; adcending values.
                         if FI + 1 > B.End {
-                            Process_Main('', '', A_LineNumber)
+                            Process_Main(Which, '', '', A_LineNumber)
                         } else {
-                            Process_Main(FI + 1, GetValue(FI + 1), A_LineNumber)
+                            Process_Main(Which, FI + 1, GetValue(FI + 1), A_LineNumber)
                         }
                     } else { ; descending values
                         if FI - 1 < B.Start {
-                            Process_Main('', '', A_LineNumber)
+                            Process_Main(Which, '', '', A_LineNumber)
                         } else {
-                            Process_Main(FI - 1, GetValue(FI - 1), A_LineNumber)
+                            Process_Main(Which, FI - 1, GetValue(FI - 1), A_LineNumber)
                         }
                     }
                 } else {
                     if i.array == 1 { ; adcending values.
                         if FI - 1 < B.Start {
-                            Process_Main('', '', A_LineNumber)
+                            Process_Main(Which, '', '', A_LineNumber)
                         } else {
-                            Process_Main(FI - 1, GetValue(FI - 1), A_LineNumber)
+                            Process_Main(Which, FI - 1, GetValue(FI - 1), A_LineNumber)
                         }
                     } else { ; descending values.
                         if FI + 1 > B.End {
-                            Process_Main('', '', A_LineNumber)
+                            Process_Main(Which, '', '', A_LineNumber)
                         } else {
-                            Process_Main(FI + 1, GetValue(FI + 1), A_LineNumber)
+                            Process_Main(Which, FI + 1, GetValue(FI + 1), A_LineNumber)
                         }
                     }
                 }
@@ -229,7 +271,7 @@ class Test_QuickFind {
          * The two indices adjacent to FI have the same value as FI, like this:
          * - ..., FI-3, FI-2, FI, FI, FI, FI+2, FI+3, ...
          */
-        Process_2() {
+        Process_2(Which) {
             if FI + 1 <= this.Len {
                 TA[FI + 1] := GetValue(FI)
             }
@@ -263,17 +305,17 @@ class Test_QuickFind {
                         if FI - 1 < B.Start {
                                 ; The ExpectedValue stays GetValue(FI)
                                 ; because that's what we put in there for this test.
-                            Process_Main(FI, GetValue(FI), A_LineNumber)
+                            Process_Main(Which, FI, GetValue(FI), A_LineNumber)
                         } else {
-                            Process_Main(FI - 1, GetValue(FI), A_LineNumber)
+                            Process_Main(Which, FI - 1, GetValue(FI), A_LineNumber)
                         }
                     } else { ; descending values.
                     ; When GT and descending, the search direction is right-to-left.
                     ; So the correct index is FI + 1 when ET.
                         if FI + 1 > B.End {
-                            Process_Main(FI, GetValue(FI), A_LineNumber)
+                            Process_Main(Which, FI, GetValue(FI), A_LineNumber)
                         } else {
-                            Process_Main(FI + 1, GetValue(FI), A_LineNumber)
+                            Process_Main(Which, FI + 1, GetValue(FI), A_LineNumber)
                         }
                     }
                 } else {
@@ -283,16 +325,16 @@ class Test_QuickFind {
                     if i.array == 1 { ; adcending values.
                         ; Search direction is left-to-right, so next greatest value is at index FI + 2.
                         if FI + 2 > B.End {
-                            Process_Main('', '', A_LineNumber)
+                            Process_Main(Which, '', '', A_LineNumber)
                         } else {
-                            Process_Main(FI + 2, GetValue(FI + 2), A_LineNumber)
+                            Process_Main(Which, FI + 2, GetValue(FI + 2), A_LineNumber)
                         }
                     } else { ; descending values.
                         ; Search direction is right-to-left.
                         if FI - 2 < B.Start {
-                            Process_Main('', '', A_LineNumber)
+                            Process_Main(Which, '', '', A_LineNumber)
                         } else {
-                            Process_Main(FI - 2, GetValue(FI - 2), A_LineNumber)
+                            Process_Main(Which, FI - 2, GetValue(FI - 2), A_LineNumber)
                         }
                     }
                 }
@@ -306,16 +348,16 @@ class Test_QuickFind {
                     ; index will be FI + 1 when ET.
                     if i.array == 1 { ; adcending values.
                         if FI + 1 > B.End {
-                            Process_Main(FI, GetValue(FI), A_LineNumber)
+                            Process_Main(Which, FI, GetValue(FI), A_LineNumber)
                         } else {
-                            Process_Main(FI + 1, GetValue(FI), A_LineNumber)
+                            Process_Main(Which, FI + 1, GetValue(FI), A_LineNumber)
                         }
                     } else { ; descending values.
                     ; Search direction is left-to-right, so correct index is FI - 1 when ET.
                         if FI - 1 < B.Start {
-                            Process_Main(FI, GetValue(FI), A_LineNumber)
+                            Process_Main(Which, FI, GetValue(FI), A_LineNumber)
                         } else {
-                            Process_Main(FI - 1, GetValue(FI), A_LineNumber)
+                            Process_Main(Which, FI - 1, GetValue(FI), A_LineNumber)
                         }
                     }
                 } else {
@@ -325,16 +367,16 @@ class Test_QuickFind {
                     ; !GT and ascending, so the search direction is right-to-left.
                     ; The next smallest value is at index FI - 2.
                         if FI - 2 < B.Start {
-                            Process_Main('', '', A_LineNumber)
+                            Process_Main(Which, '', '', A_LineNumber)
                         } else {
-                            Process_Main(FI - 2, GetValue(FI - 2), A_LineNumber)
+                            Process_Main(Which, FI - 2, GetValue(FI - 2), A_LineNumber)
                         }
                     } else { ; descending values.
                         ; Search direction is left-to-rigth.
                         if FI + 2 > B.End {
-                            Process_Main('', '', A_LineNumber)
+                            Process_Main(Which, '', '', A_LineNumber)
                         } else {
-                            Process_Main(FI + 2, GetValue(FI + 2), A_LineNumber)
+                            Process_Main(Which, FI + 2, GetValue(FI + 2), A_LineNumber)
                         }
                     }
                 }
@@ -345,8 +387,11 @@ class Test_QuickFind {
          * @description - Searches for the value at the indicated index, and the value absent
          * from the array.
          * - ..., FI-3, FI-2, FI-1, unset, FI+1, FI+2, FI+3, ...
+         * In this block, regardless of ET, the correct index will be +/- 1 from FI. No index
+         * should be returned if that index is < B.Start or > B.End depending on the direction
+         * of ascent.
          */
-        Process_3() {
+        Process_3(Which) {
             if FI + 1 > this.Len || FI - 1 < 1 {
                 return
             }
@@ -354,27 +399,31 @@ class Test_QuickFind {
             TA[FI - 1] := GetValue(FI - 1)
             TA[FI + 1] := GetValue(FI + 1)
             if GT {
-                if FI + 1 > B.End || FI - 1 < B.Start {
-                    Process_Main('', '', A_LineNumber)
-                } else {
-                    if i.array == 1 {
-                        ; GT=1; ET=any; array=1
-                        Process_Main(FI + 1, GetValue(FI + 1), A_LineNumber)
+                if i.array == 1 {
+                    if FI + 1 > B.End {
+                        Process_Main(Which, '', '', A_LineNumber)
                     } else {
-                        ; GT=1; ET=any; array=0
-                        Process_Main(FI - 1, GetValue(FI - 1), A_LineNumber)
+                        Process_Main(Which, FI + 1, GetValue(FI + 1), A_LineNumber)
+                    }
+                } else {
+                    if FI - 1 < B.Start {
+                        Process_Main(Which, '', '', A_LineNumber)
+                    } else {
+                        Process_Main(Which, FI - 1, GetValue(FI - 1), A_LineNumber)
                     }
                 }
             } else {
-                if FI + 1 > B.End || FI - 1 < B.Start {
-                    Process_Main('', '', A_LineNumber)
-                } else {
-                    if i.array == 1 {
-                        ; GT=0; ET=any; array=1
-                        Process_Main(FI - 1, GetValue(FI - 1), A_LineNumber)
+                if i.array == 1 {
+                    if FI - 1 < B.Start {
+                        Process_Main(Which, '', '', A_LineNumber)
                     } else {
-                        ; GT=0; ET=any; array=0
-                        Process_Main(FI + 1, GetValue(FI + 1), A_LineNumber)
+                        Process_Main(Which, FI - 1, GetValue(FI - 1), A_LineNumber)
+                    }
+                } else {
+                    if FI + 1 > B.End {
+                        Process_Main(Which, '', '', A_LineNumber)
+                    } else {
+                        Process_Main(Which, FI + 1, GetValue(FI + 1), A_LineNumber)
                     }
                 }
             }
@@ -418,8 +467,10 @@ class Test_QuickFind {
             Text := this.BtnCtrlNames[++k]
             G.Add('Button', 'vBtn' Text ' ys', Text).OnEvent('Click', HClickButton%Text%)
         }
-        G.Add('Checkbox', 'xs Section Checked vChkStandard', 'Standard function')
-        G.Add('Checkbox', 'ys vChkClosure', 'Closure from ``QuickFind.Func``')
+        G.Add('Checkbox', 'xs Section Checked vChkStandard', 'Standard function').OnEvent('Click', HClickCheckboxAny)
+        G.LastChecked := G['ChkStandard']
+        G.Add('Checkbox', 'ys vChkClosure', 'Closure from ``QuickFind.Func``').OnEvent('Click', HClickCheckboxAny)
+        G.Add('Checkbox', 'ys vChkDebug', 'Debug mode')
         G.Add('Button', 'xs Section vBtnPrevious_Result', 'Previous Result').OnEvent('Click', HClickButtonPrevious)
         G.Add('Button', 'xs Section vBtnPrevious_Problem', 'Previous Problem').OnEvent('Click', HClickButtonPrevious)
         G['BtnPrevious_Problem'].GetPos(, , &cw)
@@ -432,6 +483,9 @@ class Test_QuickFind {
         G.Add('Edit', 'ys w300 hp vArray')
         G.Show()
         Align.GroupWidth_S([G['BtnNext_Result'], G['BtnNext_Problem']])
+        G['BtnNext_Result'].GetPos(&cx, &cy, &cw)
+        G.Add('Text', Format('x{} y{} Section vTxtDuration', cx + cw + G.MarginX, cy), 'Duration:')
+        G.Add('Text', 'xs w100 vTxtDurationValue', '0')
 
         for Ctrl in G {
             if Ctrl.Type == 'Edit' {
@@ -441,70 +495,6 @@ class Test_QuickFind {
 
         return
 
-
-        HClickButtonClear(*) {
-            this.Stop := this.Paused := this.Init := 0
-            G['Result'].Text := G['Array'].Text := ''
-            G['TxtTotal_Result'].Text := G['TxtTotal_Problem'].Text := '0'
-            G['EditJump_Result'].Text := G['EditJump_Problem'].Text := '1'
-            this()
-        }
-        HChangeEditJump(Ctrl, *) {
-            Ctrl.Text := RegExReplace(Ctrl.Text, '[^\d]', '', &ReplaceCount)
-            ControlSend('{End}', Ctrl)
-            if ReplaceCount {
-                this.ShowTooltip('Numbers only!')
-            }
-        }
-        HClickButtonStart(*) {
-            if G['ChkStandard'].Value {
-                if G['ChkClosure'].Value {
-                    this.ShowTooltip('I apologize, but this is only compatible with one test at a time. Please check only one box.')
-                } else {
-                    this(1)
-                }
-            } else if G['ChkClosure'].Value {
-                this(2)
-            }
-        }
-        HClickButtonPause(*) {
-            this.Paused := 1
-            this.ShowTooltip('Paused.')
-        }
-        HClickButtonStop(*) {
-            this.Stop := 1
-            this.ShowTooltip('Stopping.')
-        }
-        HClickButtonEqualTo(*) {
-            this.LaunchEqualToTester()
-        }
-        HClickButtonExit(*) {
-            ExitApp()
-        }
-        HClickButtonPrevious(Ctrl, *) {
-            if this.IncIndex(_GetName(Ctrl), -1) {
-                this.ShowTooltip('No ' StrLower(_GetName(Ctrl)) 's!')
-            } else {
-                this.UpdateDisplay(_GetName(Ctrl))
-            }
-        }
-        HClickButtonNext(Ctrl, *) {
-            if this.IncIndex(_GetName(Ctrl), 1) {
-                this.ShowTooltip('No ' StrLower(_GetName(Ctrl)) 's!')
-            } else {
-                this.UpdateDisplay(_GetName(Ctrl))
-            }
-        }
-        HClickButtonReload(*) {
-            Reload()
-        }
-        HClickButtonJump(Ctrl, *) {
-            if this.SetIndex(_GetName(Ctrl), G['EditJump'].Text) {
-                this.ShowTooltip('No ' StrLower(_GetName(Ctrl)) 's!')
-            } else {
-                this.UpdateDisplay(_GetName(Ctrl))
-            }
-        }
         _CreateScroller(Name) {
             G['BtnPrevious_' Name].GetPos(&cx, &cy, &cw, &ch)
             G.Add('Edit', Format('x{} y{} w50 Section vEditJump_{}', cx + cw + G.MarginX, cy, Name), 1).OnEvent('Change', HChangeEditJump)
@@ -516,14 +506,97 @@ class Test_QuickFind {
             Align.CenterV(G['TxtTotal_' Name], G['BtnPrevious_' Name])
             Align.CenterV(G['EditJump_' Name], G['BtnPrevious_' Name])
         }
+
         _GetName(Ctrl) => StrSplit(Ctrl.Name, '_')[2]
-    }
-    static IncIndex(Name, n) {
-        if !this.%Name%.Length {
-            return 1
+
+        HChangeEditJump(Ctrl, *) {
+            Ctrl.Text := RegExReplace(Ctrl.Text, '[^\d]', '', &ReplaceCount)
+            ControlSend('{End}', Ctrl)
+            if ReplaceCount {
+                this.ShowTooltip('Numbers only!')
+            }
         }
-        this.SetIndex(Name, this.%Name%Index + n)
-        this.G['EditJump_' Name].Text := this.%Name%Index
+
+        HClickButtonClear(*) {
+            this.Stop := this.Paused := this.Init := this.Finished := 0
+            G['Result'].Text := G['Array'].Text := ''
+            G['TxtTotal_Result'].Text := G['TxtTotal_Problem'].Text := '0'
+            G['EditJump_Result'].Text := G['EditJump_Problem'].Text := '1'
+            this()
+        }
+
+        HClickButtonEquality(*) {
+            this.LaunchEqualToTester()
+        }
+
+        HClickButtonExit(*) {
+            ExitApp()
+        }
+
+        HClickButtonJump(Ctrl, *) {
+            if this.SetIndex(_GetName(Ctrl), G['EditJump' _GetName(Ctrl)].Text) {
+                this.ShowTooltip('No ' StrLower(_GetName(Ctrl)) 's!')
+            } else {
+                Name := _GetName(Ctrl)
+                this.UpdateDisplay(this.%Name%[this.%Name%Index])
+            }
+        }
+
+        HClickButtonListLines(*) {
+            ListLines()
+        }
+
+        HClickButtonNext(Ctrl, *) {
+            if this.IncIndex(_GetName(Ctrl), 1) {
+                this.ShowTooltip('No ' StrLower(_GetName(Ctrl)) 's!')
+            } else {
+                Name := _GetName(Ctrl)
+                this.UpdateDisplay(this.%Name%[this.%Name%Index])
+            }
+        }
+
+        HClickButtonPause(*) {
+            this.Paused := 1
+            this.ShowTooltip('Paused.')
+        }
+
+        HClickButtonPrevious(Ctrl, *) {
+            if this.IncIndex(_GetName(Ctrl), -1) {
+                this.ShowTooltip('No ' StrLower(_GetName(Ctrl)) 's!')
+            } else {
+                Name := _GetName(Ctrl)
+                this.UpdateDisplay(this.%Name%[this.%Name%Index])
+            }
+        }
+
+        HClickButtonReload(*) {
+            Reload()
+        }
+
+        HClickButtonStart(*) {
+            if this.Finished {
+                HClickButtonClear()
+            }
+            this.StartTime := A_TickCount
+            if G['ChkStandard'].Value {
+                this(1)
+            } else if G['ChkClosure'].Value {
+                this(2)
+            }
+            this.EndTime := A_TickCount
+            G['TxtDurationValue'].Text := Round((this.EndTime - this.StartTime) / 1000, 4)
+        }
+
+        HClickButtonStop(*) {
+            this.Stop := 1
+            this.ShowTooltip('Stopping.')
+        }
+
+        HClickCheckboxAny(Ctrl, *) {
+            G.LastChecked.Value := 0
+            G.LastChecked := Ctrl
+            Ctrl.Value := 1
+        }
     }
     static SetIndex(Name, Value) {
         if !this.%Name%.Length {
@@ -540,6 +613,13 @@ class Test_QuickFind {
             this.__%Name%Index := Value
         }
     }
+    static IncIndex(Name, n) {
+        if !this.%Name%.Length {
+            return 1
+        }
+        this.SetIndex(Name, this.%Name%Index + n)
+        this.G['EditJump_' Name].Text := this.%Name%Index
+    }
     static __ResultIndex := 0
     static ResultIndex {
         Get => this.__ResultIndex
@@ -550,8 +630,7 @@ class Test_QuickFind {
         Get => this.__ProblemIndex
         Set => this.SetIndex('Problem', Value)
     }
-    static UpdateDisplay(Name) {
-        ResultObj := this.%Name%[this.%Name%Index]
+    static UpdateDisplay(ResultObj) {
         i := ResultObj.i
         Results := [
             ['Find index', ResultObj.FindIndex]
@@ -586,40 +665,50 @@ class Test_QuickFind {
         EG := Gui('-DPIScale +Resize')
         EG.a := []
         EG.SetFont('s11', 'roboto mono')
-        EG.add('text', 'section vtxtStart', 'Start value:')
-        EG.add('edit', 'ys w70 vinputstartvalue')
-        EG.add('text', 'ys vtxtlength', 'Length:')
-        EG.add('edit', 'ys w70 vinputlength')
-        EG.add('button', 'ys vbtnmake', 'Make').OnEvent('Click', hclickbuttonmake)
-        EG.add('text', 'xs section vtxtfind', 'Find:')
-        EG.add('edit', 'ys w70 vinput')
-        EG.add('text', 'ys vtxtresult', 'Result:')
-        EG.Add('edit', 'ys w140 voutput')
-        EG.Add('button', 'ys vtest', 'Test').onevent('click', hclickbuttontest)
-        EG.Add('checkbox', 'xs Section checked vdirection', 'Search direction')
-        EG.add('edit', 'xs section w200 vsetindices')
-        EG.add('button', 'ys vbtnsetindices', 'Set indices').Onevent('click', hclickbuttonsetindices)
-        ; EG.add('button', 'xs section vmodifyarray', 'Modify array').OnEvent('click', hclickbuttonmodifyarray)
+        EG.add('Text', 'section vTxtInfo', 'To make a test array, enter in the start value (the value'
+        ' that`r`nwill be at index 1) and the length of the array (each index`r`nwill increment in value by 1).')
+        EG.add('Edit', 'xs Section w70 vMakeStartValue', '1')
+        EG.add('Edit', 'ys w70 vMakeLength', '1000')
+        EG.add('Button', 'ys vbtnmake', 'Make').OnEvent('Click', HClickButtonMake)
+        EG.add('Text', 'section xs vTxtParameters', 'Parameters:')
+        EG.Add('Button', 'ys vtest', 'Test').onevent('click', HClickButtonTest)
+        EG.add('Text', 'section xs vTxtIndexStart', 'IndexStart:')
+        EG.add('Edit', 'ys w70 vIndexStart', '1')
+        EG.add('Text', 'ys vTxtIndexEnd', 'IndexEnd:')
+        EG.add('Edit', 'ys w70 vIndexEnd', '1000')
+        EG.add('Text', 'xs section vTxtFind', 'Find:')
+        EG.add('Edit', 'ys w70 vFind', '500')
+        EG.add('Text', 'ys vTxtResult', 'Result:')
+        EG.Add('Edit', 'ys w400 vResult')
+        EG.Add('Text', 'xs Section vTxtSetIndices', 'Write a list of ``index,value`` pairs to update the indices.')
+        EG.add('Edit', 'xs section w200 vSetIndices')
+        EG.add('Button', 'ys vBtnSetIndices', 'Set indices').Onevent('click', HClickButtonSetIndices)
+        ; EG.add('Button', 'xs section vmodifyarray', 'Modify array').OnEvent('click', hclickbuttonmodifyarray)
         EG.show()
-        EG['output'].Setfont('s10')
+        EG['Result'].Setfont('s10')
 
-        hclickbuttontest(*) {
-            Result := QuickFind.EqualTo(EG.a, EG['input'].text, , , EG['direction'].value)
-            if IsObject(Result) {
-                EG['output'].text := 'Start: ' Result.Start '  End: ' Result.End
-            } else {
-                EG['output'].text := Result
+        HClickButtonTest(*) {
+            if !EG.HasOwnProp('a') || !EG.a.Length {
+                if EG['MakeStartValue'].Text && EG['MakeLength'].Text {
+                    HClickButtonMake()
+                } else {
+                    this.ShowTooltip('No array!')
+                    return
+                }
             }
+            Result := QuickFind.Equality(EG.a, EG['Find'].Text, &LastIndex, EG['IndexStart'].Text, EG['IndexEnd'].Text)
+            EG['Result'].Text := 'Found index: ' Result '; Last index: ' (LastIndex??'')
+            this.ShowTooltip('Done!')
         }
         ; hclickbuttonmodifyarray(*) {
         ;     MG := Gui('-DPIScale +Resize')
         ;     MG.SetFont('s10', 'roboto mono')
-        ;     mg.Add('button', 'Section vbtnprevious', 'Previous').OnEvent('click', hclickbuttonprevious)
-        ;     mg.Add('button', 'ys vbtnnext', 'Next').OnEvent('click', hclickbuttonnext)
-        ;     mg.Add('button', 'ys vbtnpage1', 'Save').OnEvent('click', hclickbuttonsave)
-        ;     mg.Add('edit', 'section w400 ve1')
+        ;     mg.Add('Button', 'Section vbtnprevious', 'Previous').OnEvent('click', hclickbuttonprevious)
+        ;     mg.Add('Button', 'ys vbtnnext', 'Next').OnEvent('click', hclickbuttonnext)
+        ;     mg.Add('Button', 'ys vbtnpage1', 'Save').OnEvent('click', hclickbuttonsave)
+        ;     mg.Add('Edit', 'section w400 ve1')
         ;     loop 19 {
-        ;         mg.Add('edit', 'xs w400 ve' A_Index + 1)
+        ;         mg.Add('Edit', 'xs w400 ve' A_Index + 1)
         ;     }
 
 
@@ -637,14 +726,14 @@ class Test_QuickFind {
         ;                     if EG.a.Length < i {
         ;                         break
         ;                     }
-        ;                     e.text .= EG.a[++i] ','
+        ;                     e.Text .= EG.a[++i] ','
         ;                 }
         ;             }
         ;         }
         ;     }
         ; }
-        hclickbuttonsetindices(*) {
-            split := StrSplit(EG['setindices'].text, ',', '`s`t')
+        HClickButtonSetIndices(*) {
+            split := StrSplit(EG['setindices'].Text, ',', '`s`t')
             loop split.length / 2 {
                 if split[A_Index * 2] = 'unset' {
                     EG.a.Delete(split[A_Index * 2 - 1])
@@ -652,14 +741,17 @@ class Test_QuickFind {
                     EG.a[split[A_Index * 2 - 1]] :=  split[A_Index * 2]
                 }
             }
+            this.ShowTooltip('Set!')
         }
-        hclickbuttonmake(*) {
+        HClickButtonMake(*) {
             EG.a := []
-            n := number(EG['inputstartvalue'].text)
-            EG.a.capacity := EG['inputlength'].text
+            n := number(EG['MakeStartValue'].Text)
+            EG.a.capacity := EG['MakeLength'].Text
             loop EG.a.capacity {
                 EG.a.push(n++)
             }
+            EG['IndexEnd'].Text := EG.a.length
+            this.ShowTooltip('Created!')
         }
     }
 
@@ -709,7 +801,7 @@ class Test_QuickFind {
     ; }
     static UpdateArrayCtrl(ArrCopyObj) {
         k := ArrCopyObj.Start - 1
-        while ++k <= ArrCopyObj.End {
+        while ++k <= ArrCopyObj.End - 1 {
             Str .= Format('{:5}', k) ' : ' ArrCopyObj.Arr[A_Index] '`r`n'
         }
         this.G['Array'].Text := Trim(Str, '`r`n')
