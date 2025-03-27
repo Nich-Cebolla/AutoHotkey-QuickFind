@@ -1,9 +1,9 @@
 
 #Include <Object.Prototype.Stringify_V1.0.0>
-; https://github.com/Nich-Cebolla/Stringify-ahk/blob/main/Object.Stringify.ahk
+; https://github.com/Nich-Cebolla/Stringify-ahk/blob/main/Object.Prototype.Stringify.ahk
 #Include <Align_V1.0.0>
 ; https://github.com/Nich-Cebolla/AutoHotkey-LibV2/blob/main/Align.ahk
-#Include QuickFind Copy.ahk
+#Include QuickFind.ahk
 #SingleInstance force
 Test_QuickFind()
 
@@ -609,10 +609,37 @@ class Test_QuickFind {
                     this.ShowTooltip('Debug off!')
                 }
             } else {
-                DG := Gui('+Owner +Resize -DPIScale')
+                if Ctrl.Value {
+                    static Url := 'https://github.com/Nich-Cebolla/AutoHotkey-QuickFind/blob/main/Debug_QuickFind.ahk'
+                    if !this.HasOwnProp('DG') {
+                        _MakeDG()
+                    } else {
+                        try {
+                            if WinExist(this.DG.Hwnd) {
+                                this.DG.Show()
+                            }
+                        } catch {
+                            _MakeDG()
+                        }
+                    }
+                } else {
+                    try {
+                        if WinExist(this.DG.Hwnd) {
+                            this.DG.Hide()
+                        }
+                    }
+                }
+            }
+            HClickLinkDebugfile(*) {
+                Run(Url)
+            }
+            _MakeDG() {
+                DG := this.DG := Gui('+Owner +Resize -DPIScale')
+                DG.SetFont('s11')
                 DG.Add('Text', 'Section', 'The debug version of ``QuickFind.ahk`` is not active. You can download it here:')
-                DG.Add('Link', 'xs', '<a id="https://github.com/Nich-Cebolla/AutoHotkey-QuickFind/blob/main/Debug_QuickFind.ahk">'
-                'https://github.com/Nich-Cebolla/AutoHotkey-QuickFind/blob/main/Debug_QuickFind.ahk</a>')
+                DG.Add('Link', 'xs', '<a id="' url '">'
+                url '</a>').OnEvent('Click', HClickLinkDebugfile)
+                DG.Show()
             }
         }
 
