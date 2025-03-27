@@ -14,7 +14,7 @@ The function has been changed to a class. Nothing has changed about the `QuickFi
 Added `QuickFind.Func()` which initializes the needed values that are initialized at the start of `QuickFind`, then returns a closure that can be called repeadly to search the input array. This will perform slightly better compared to calling `QuickFind` multiple times for the same input array.
 
 ### V1.2.0
-Added `QuickFind.EqualTo`. `QuickFind.EqualTo` performs a binary search with only an equality condition.
+Added `QuickFind.Equality`. `QuickFind.Equality` performs a binary search with only an equality condition.
 
 `Test_QuickFind.ahk` has been completely reworked and now features a helpful Gui that can be used for debugging. It requires two dependencies which are linked in the file.
 
