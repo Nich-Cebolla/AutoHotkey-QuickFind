@@ -5,6 +5,8 @@
     License: MIT
 */
 
+global qf_debug_file := true
+
 class QuickFind {
     static __New() {
         if this.Prototype.__Class == 'QuickFind' {
