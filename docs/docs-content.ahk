@@ -1,12 +1,15 @@
-﻿#Include ..\..\DocsBuilder\DocsBuilder.ahk
+#Include ..\..\DocsBuilder\DocsBuilder.ahk
 ; https://github.com/Nich-Cebolla/AutoHotkey-MD-to-AHK-Forum-Post
+; Last version update: 1.0.2
 
 AhkForum := {
     Link: 'https://www.autohotkey.com/boards/viewtopic.php?f=83&t=135897'
   , Header2Color: '[color=#800000]'
   , Header3Color: '[color=#800000]'
+  , Header4Color: '[color=#800000]'
   , Header2Size: '[size=165]'
   , Header3Size: '[size=150]'
+  , Header4Size: '[size=140]'
   , TextSize: '[size=125]'
   , TextColor: '[color=#000000]'
   , ParamTypeColor: '[color=#008000]'
