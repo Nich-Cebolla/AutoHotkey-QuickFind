@@ -1,14 +1,13 @@
 
 #Include <Object.Prototype.Stringify_V1.0.0>
-; https://github.com/Nich-Cebolla/Stringify-ahk/blob/main/Object.Prototype.Stringify.ahk
+; https://github.com/Nich-Cebolla/Stringify-ahk/blob/main/Object.Stringify.ahk
 #Include <Align_V1.0.0>
 ; https://github.com/Nich-Cebolla/AutoHotkey-LibV2/blob/main/Align.ahk
-#Include QuickFind.ahk
+#Include QuickFind Copy.ahk
 #SingleInstance force
 Test_QuickFind()
 
-global qf_debug := { pause: false, lines: [] }
-qf_debug.lines.Capacity := 100
+global qf_debug := { pause: false, lines: '' }
 
 /**
  * @description - Initiates the test.
@@ -34,7 +33,7 @@ class Test_QuickFind {
     , Finished := 0
 
     static __New() {
-        FindIndices := this.FindIndices := [1, 2, 3, 4, 5, 9, 10, 11, 499, 500, 501, 989, 990, 991
+        FindIndices := this.FindIndices := [1, 2, 3, 4, 5, 9, 10, 11, 250, 499, 500, 501, 989, 990, 991
         , 994, 995, 996, 998, 999, 1000]
         StartIndices := [1, 100, 500, 900, 999]
         Offsets := [1, 2, 4, 5, 99, 100, 499, 500, 997, 998, 999]
@@ -179,7 +178,9 @@ class Test_QuickFind {
                     this.Problem.Push(O := _Obj(FoundValue??'', Result))
                     this.UpdateDisplay(O)
                     this.G['TxtTotal_Problem'].Text := this.Problem.Length
-                    ; Place breakpoint to go back into function.
+                    if qf_debug.HasOwnProp('lines') && qf_debug.lines is Array {
+                        this.WriteDebug()
+                    }
                     qf_debug.pause := true
                     Result := _GetResult(&FoundValue)
                     if qf_debug.pause {
@@ -189,6 +190,8 @@ class Test_QuickFind {
                     this.Result.Push(_Obj(FoundValue??'', Result))
                     this.G['TxtTotal_Result'].Text := this.Result.Length
                 }
+                qf_debug.lines := []
+                qf_debug.lines.Capacity := 1000
             } else {
                 Result := _GetResult(&FoundValue)
                 if Result !== ExpectedIndex || (FoundValue??'') !== ExpectedValue {
@@ -467,10 +470,10 @@ class Test_QuickFind {
             Text := this.BtnCtrlNames[++k]
             G.Add('Button', 'vBtn' Text ' ys', Text).OnEvent('Click', HClickButton%Text%)
         }
-        G.Add('Checkbox', 'xs Section Checked vChkStandard', 'Standard function').OnEvent('Click', HClickCheckboxAny)
+        G.Add('Checkbox', 'xs Section Checked vChkStandard', 'Standard function').OnEvent('Click', HClickCheckboxWhich)
         G.LastChecked := G['ChkStandard']
-        G.Add('Checkbox', 'ys vChkClosure', 'Closure from ``QuickFind.Func``').OnEvent('Click', HClickCheckboxAny)
-        G.Add('Checkbox', 'ys vChkDebug', 'Debug mode')
+        G.Add('Checkbox', 'ys vChkClosure', 'Closure from ``QuickFind.Func``').OnEvent('Click', HClickCheckboxWhich)
+        G.Add('Checkbox', 'ys vChkDebug', 'Debug mode').OnEvent('Click', HClickCheckboxDebug)
         G.Add('Button', 'xs Section vBtnPrevious_Result', 'Previous Result').OnEvent('Click', HClickButtonPrevious)
         G.Add('Button', 'xs Section vBtnPrevious_Problem', 'Previous Problem').OnEvent('Click', HClickButtonPrevious)
         G['BtnPrevious_Problem'].GetPos(, , &cw)
@@ -479,9 +482,11 @@ class Test_QuickFind {
         _CreateScroller('Problem')
         G['BtnPrevious_Problem'].GetPos(, &cy, , &ch)
         G['ChkClosure'].GetPos(&cx, , &cw)
-        G.Add('Edit', Format('x{} y{} w400 r16 Section +Wrap vResult', G.MarginX, cy + ch + G.MarginY))
+        G.Add('Edit', Format('x{} y{} w400 r21 Section +Wrap vResult', G.MarginX, cy + ch + G.MarginY))
         G.Add('Edit', 'ys w300 hp vArray')
+
         G.Show()
+
         Align.GroupWidth_S([G['BtnNext_Result'], G['BtnNext_Problem']])
         G['BtnNext_Result'].GetPos(&cx, &cy, &cw)
         G.Add('Text', Format('x{} y{} Section vTxtDuration', cx + cw + G.MarginX, cy), 'Duration:')
@@ -534,7 +539,7 @@ class Test_QuickFind {
         }
 
         HClickButtonJump(Ctrl, *) {
-            if this.SetIndex(_GetName(Ctrl), G['EditJump' _GetName(Ctrl)].Text) {
+            if this.SetIndex(_GetName(Ctrl), G['EditJump_' _GetName(Ctrl)].Text) {
                 this.ShowTooltip('No ' StrLower(_GetName(Ctrl)) 's!')
             } else {
                 Name := _GetName(Ctrl)
@@ -592,7 +597,26 @@ class Test_QuickFind {
             this.ShowTooltip('Stopping.')
         }
 
-        HClickCheckboxAny(Ctrl, *) {
+        HClickCheckboxDebug(Ctrl, *) {
+            global qf_debug, qf_debug_file
+            if IsSet(qf_debug_file) {
+                if Ctrl.Value {
+                    qf_debug.lines := []
+                    qf_debug.lines.Capacity := 1000
+                    this.ShowTooltip('Debug on!')
+                } else {
+                    qf_debug.lines := ''
+                    this.ShowTooltip('Debug off!')
+                }
+            } else {
+                DG := Gui('+Owner +Resize -DPIScale')
+                DG.Add('Text', 'Section', 'The debug version of ``QuickFind.ahk`` is not active. You can download it here:')
+                DG.Add('Link', 'xs', '<a id="https://github.com/Nich-Cebolla/AutoHotkey-QuickFind/blob/main/Debug_QuickFind.ahk">'
+                'https://github.com/Nich-Cebolla/AutoHotkey-QuickFind/blob/main/Debug_QuickFind.ahk</a>')
+            }
+        }
+
+        HClickCheckboxWhich(Ctrl, *) {
             G.LastChecked.Value := 0
             G.LastChecked := Ctrl
             Ctrl.Value := 1
@@ -661,6 +685,16 @@ class Test_QuickFind {
         this.G['Result'].Text := Str
         this.UpdateArrayCtrl(ResultObj.Arr)
     }
+    static WriteDebug() {
+        global qf_debug
+        for line in qf_debug.lines {
+            Str .= line '`r`n'
+        }
+        f := FileOpen(A_ScriptDir '\qf_debug_out.txt', 'w')
+        f.Write(Str)
+        sleep 500
+        f.Close()
+    }
     static LaunchEqualToTester() {
         EG := Gui('-DPIScale +Resize')
         EG.a := []
@@ -683,7 +717,7 @@ class Test_QuickFind {
         EG.Add('Text', 'xs Section vTxtSetIndices', 'Write a list of ``index,value`` pairs to update the indices.')
         EG.add('Edit', 'xs section w200 vSetIndices')
         EG.add('Button', 'ys vBtnSetIndices', 'Set indices').Onevent('click', HClickButtonSetIndices)
-        ; EG.add('Button', 'xs section vmodifyarray', 'Modify array').OnEvent('click', hclickbuttonmodifyarray)
+        ; EG.add('Button', 'xs section vModifyArray', 'Modify array').OnEvent('click', HClickButtonModifyArray)
         EG.show()
         EG['Result'].Setfont('s10')
 
@@ -700,7 +734,7 @@ class Test_QuickFind {
             EG['Result'].Text := 'Found index: ' Result '; Last index: ' (LastIndex??'')
             this.ShowTooltip('Done!')
         }
-        ; hclickbuttonmodifyarray(*) {
+        ; HClickButtonModifyArray(*) {
         ;     MG := Gui('-DPIScale +Resize')
         ;     MG.SetFont('s10', 'roboto mono')
         ;     mg.Add('Button', 'Section vbtnprevious', 'Previous').OnEvent('click', hclickbuttonprevious)
