@@ -1,6 +1,6 @@
 
 #Include <Object.Prototype.Stringify_V1.0.0>
-; https://github.com/Nich-Cebolla/Stringify-ahk/blob/main/Object.Stringify.ahk
+; https://github.com/Nich-Cebolla/Stringify-ahk/blob/main/Object.Prototype.Stringify.ahk
 #Include <Align_V1.0.0>
 ; https://github.com/Nich-Cebolla/AutoHotkey-LibV2/blob/main/Align.ahk
 #Include QuickFind.ahk
