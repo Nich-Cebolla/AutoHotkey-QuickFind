@@ -4,83 +4,169 @@ An AutoHotkey (AHK) implementation of a binary search.
 
 This function performs a binary search on a sorted array, returning the index of the target value if found, or an empty string if not found. A binary search is when you split a range in half repeatedly to narrow in on an input value.
 
-A binary search is optimal when there is little information known about the value that is being searched for and the distribution of values in the array, as this will, on average, require much less processing time to identify the needed value compared to a sequential search. It's also ideal for situations when the benefit for writing code that analyzes and responds to an array's current distribution of values outweighs the cost of writing and maintaining that code, because this will consistently require a small bit of processing time to perform its function, even on very large arrays.
+A binary search is optimal when there is little information known about the value that is being searched for and the distribution of values in the array, as this will, on average, require much less processing time to identify the needed value compared to a sequential search.
 
 Within the file `QuickFind_CharExample.ahk` you will find an example of how to use `QuickFind` to search for a word in an array sorted alphabetically.
 
 ### V1.1.0:
 The function has been changed to a class. Nothing has changed about the `QuickFind` function itself; it is still called from `QuickFind()`.
 
-`QuickFind.Func()` returns a function object that can be called repeatedly to search an input array. The intent is to reduce processing overhead when repeatedly searching an array.
+Added `QuickFind.Func()` which initializes the needed values that are initialized at the start of `QuickFind`, then returns a closure that can be called repeadly to search the input array. This will perform slightly better compared to calling `QuickFind` multiple times for the same input array.
 
-When using `QuickFind.Func`, your code should adhere to these expectations for the function to return the expected result:
-- The array is sorted in order of value when the function is called.
-- You cannot change the `IndexStart` nor `IndexEnd` values (handling these incur the greatest overhead, so permitting them to be variable would defeat the purpose). Consequently, the index range that is being searched is the same as the initial `IndexStart` and `IndexEnd` values. To be precise, an error will not occur unless the length of the array drops below the initial `IndexEnd` value, so adding values to the array is not necessarily problematic, but any values past the initial `IndexEnd` value will not be included in the search.
+### V1.2.0
+Added `QuickFind.EqualTo`. `QuickFind.EqualTo` performs a binary search with only an equality condition.
 
-@@@Link@@@
+`Test_QuickFind.ahk` has been completely reworked and now features a helpful Gui that can be used for debugging. It requires two dependencies which are linked in the file.
 
-## Parameters - QuickFind
+@@@link@@@
+
+## QuickFind - Details
+- The array is assumed to be in order of value.
+- The array may have unset indices as long as every set index is in order.
+- Items may be objects - set `ValueCallback` to return the item value.
+```ahk
+MyArr := [ { prop: 1 }, { prop: 22 }, { prop: 1776 } ]
+AccessorFunc(Item, *) {
+    return Item.prop
+}
+MsgBox(QuickFind(MyArr, 22, , , , , AccessorFunc)) ; 2
+```
+- `QuickFind` determines the search direction internally to allow you to make a decision based on whether you want to find the next greatest or next lowest value. If search direction is relevant to your script or function, the direction is defined as:
+  - When `Condition` is ">" or ">=", the search direction is the the same as the direction of ascent (the search direction is the same as the direction values increase).
+  - When `Condition` is "<" or "<=", the search direction is the inverse of the direction of ascent (the search direction is the same as the direction values decrease).
+  - If every set index within the array contains the same value, and that value satisfies the condition, and at least one set index falls between `IndexStart` and `IndexEnd`, then the function defaults to returning the first set index between `IndexStart` and `IndexEnd` from left-to-right.
+
+#### Parameters
 - {Array} Arr - The array to search.
-- {Number|Object} Value - The value to search for. When the values in the array are objects, `Value` can be an object as well as long as the numerical value is accessed using the same accessor as the items. However, this value is not required to be an object when the items are; it may be a number regardless of what type of items are in the array. The inverse is not true; `Value` cannot be an object when the items are not objects.
+- {Number|Object} Value - The value to search for. This value may be an object as long as its numerical value can be returned by the `ValueCallback` function. This is not required to be an object when the items in the array are objects; it can be either an object or number. If `ValueCallback` accepts more than just the object as a parameter ({@link QuickFind.Call~ValueCallback}) then it is recommended to pass `Value` as a number, or make the second and third parameters of the callback optional.
 - {VarRef} [OutValue] - A variable that will receive the value at the found index.
-- {Boolean} [GreaterThan=true] - If true, the function searches for the first index with a value that is GreaterThan than the input value. If false, the function searches for the first index with a value that is less than the input value.
-- {Boolean} [EqualTo=true] - If true, the condition includes equality. If false, the condition is strictly greater or less than.
+- {String} [Condition='>='] - The inequality symbol indicating what condition satisfies the search. Valid values are:
+  - ">": `QuickFind` returns the index of the first value greater than the input value.
+  - ">=": `QuickFind` returns the index of the first value greater than or equal to the input value.
+  - "<": `QuickFind` returns the index of the first value less than the input value.
+  - "<=": `QuickFind` returns the index of the first value less than or equal to the input value.
 - {Number} [IndexStart=1] - The index to start the search at.
 - {Number} [IndexEnd] - The index to end the search at. If not provided, the length of the array is used.
-- {String} [ValueProp] - The property to use when comparing objects
-- {String} [ValueKey] - The key to use when comparing objects.
-- {Func|BoundFunc|Closure} [ValueCallback] - The function to use when comparing objects. The function should accept the object as its only parameter, and return a number.
+- {Func} [ValueCallback] - A function that returns the item's numeric value. The function can accept up to three parameters, in this order. If not using one of the parameters, be sure to include the necessary `*` symbol to avoid a runtime error.
+  - The current item being evaluated.
+  - The item's index.
+  - The input array.
+```ahk
+; Assume for some reason I have an array that, on the odd indices contains an item with a
+; property `Prop`, and on the even indices contains an item with a key `key`.
+MyArr := [ { Prop: 1 }, Map('key', 22), { Prop: 55 }, Map('key', 55), { Prop: 1776 } ]
+; I don't need the array object for my function to accomplish it's task, so I put `*` to
+; ignore that parameter.
+AccessorFunc(Item, Index, *) {
+    if Mod(Index, 2) {
+        return Item.Prop
+    } else {
+        return Item['key']
+    }
+}
+; I could also accomplish the same thing like this
+AccessorFuncBetter(Item, *) {
+    if Type(Item) == 'Map' {
+        return Item['key']
+    } else {
+        return Item.Prop
+    }
+}
+```
 
-## Returns - QuickFind
-- {Integer} - The index of the found value, or an empty string if not found.
+#### Returns
+- {Integer} - The index of the first value that satisfies the condition.
 
-## Parameters - QuickFind.Func
+## QuickFind.Func - Details
+Added V1.1.0
+- The array does not need to have the same values in it each time the function is called, but these conditions must be true for the function to return the expected result:
+  - The array must be sorted in the same direction as it was when the function object was created.
+  - The array cannot be a shorter length than `IndexEnd`.
+  - The array could be longer than `IndexEnd`, but any values past `IndexEnd` are ignored.
+- The reference count for the input array is incremented by 1. If you need to dispose the array, you will have to call `Dispose` on this object to get rid of that reference. Calling the function after `Dispose` results in an error.
+- The function parameters are:
+  - **Value** - The value to search for.
+  - **OutValue** - A variable that will receive the value at the found index.
+```ahk
+Arr := [1, 5, 12, 19, 44, 101, 209, 209, 230, 1991]
+Finder := QuickFind.Func(Arr)
+Index := Finder(12, &Value)
+MsgBox(Index) ; 3
+MsgBox(Value) ; 12
+; Do more work
+; When finished
+Finder.Dispose()
+Index := Finder(44, &Value) ; Error: This object has been disposed.
+```
+
+#### Parameters
 - {Array} Arr - The array to search.
-- {Boolean} [GreaterThan=true] - If true, the function searches for the first index with a value that is GreaterThan than the input value. If false, the function searches for the first index with a value that is less than the input value.
-- {Boolean} [EqualTo=true] - If true, the condition includes equality. If false, the condition is strictly greater or less than.
+- {String} [Condition='>='] - The inequality symbol indicating what condition satisfies the search. Valid values are:
+  - ">": `QuickFind` returns the index of the first value greater than the input value.
+  - ">=": `QuickFind` returns the index of the first value greater than or equal to the input value.
+  - "<": `QuickFind` returns the index of the first value less than the input value.
+  - "<=": `QuickFind` returns the index of the first value less than or equal to the input value.
 - {Number} [IndexStart=1] - The index to start the search at.
 - {Number} [IndexEnd] - The index to end the search at. If not provided, the length of the array is used.
-- {String} [ValueProp] - The property to use when comparing objects
-- {String} [ValueKey] - The key to use when comparing objects.
-- {Func|BoundFunc|Closure} [ValueCallback] - The function to use when comparing objects. The function should accept the object as its only parameter, and return a number.
+- {Func} [ValueCallback] - A function that returns the item's numeric value. The function can accept up to three parameters, in this order. If not using one of the parameters, be sure to include the necessary `*` symbol to avoid a runtime error.
+  - The current item being evaluated.
+  - The item's index.
+  - The input array.
 
-## Returns - QuickFind.Func
+#### Returns
 - {QuickFind.Func} - The function object.
 
 The function parameters are:
-- {Number|Object} Value - The value to search for. See the description in the section "Parameters - QuickFind".
+- {Number|Object} Value - The value to search for.
 - {VarRef} [OutValue] - A variable that will receive the value at the found index.
+
+## QuickFind.Equality - Details
+Added V1.2.0
+Performs a binary search on an array to find one or more indices that contain the input value. This function has these characteristics:
+- The array is assumed to be in order of value.
+- The array may have unset indices as long as every set index is in order.
+- Items may be objects - set `ValueCallback` to return the item value.
+- The search direction is always left-to-right. If there are multiple indices with the input value, the index returned by the function will be the lowest index, and the index assigned to `OutLastIndex` will be the highest index.
+
+#### Parameters
+- {Array} Arr - The array to search.
+- {Number|Object} Value - The value to search for. This value may be an object as long as its numerical value can be returned by the `ValueCallback` function. This is not required to be an object when the items in the array are objects; it can be either an object or number.
+- {VarRef} [OutLastIndex] - If there are multiple indices containing the input value, `QuickFind.Equality` assigns to this variable the last index which contains the input value. If there is one index containing the input value, `OutLastIndex` will be the same as the return value.
+- {Number} [IndexStart=1] - The index to start the search at.
+- {Number} [IndexEnd] - The index to end the search at. If not provided, the length of the array is used.
+- {Func} [ValueCallback] - The function that returns the item's numeric value. The function can accept up to three parameters, in this order:
+  - The current item being evaluated.
+  - The item's index.
+  - The input array.
+
+#### Returns
+- {Integer} - The index of the first value that satisfies the condition.
 
 ## Limitations
 - The array is assumed to be in order of value.
-- The function cannot search for only an equal value. The condition must include greater than or less than.
+- The test script is currently tied to the Gui, and so cannot (easily) be included as part of an automated validation process.
+- `QuickFind.Equality` does not have an associated `QuickFind.Func.Equality`. The initialization overhead for `QuickFind.Equality` is quite a bit less compared to `QuickFind.Call`, so it's not a major loss, but is still not ideal.
 
 ## Implementation Details
-This function has these characteristics:
-- The direction in which this function handles its search is dependent on the value of `GreaterThan` and also the direction the values in the array increase. For example, if `GreaterThan` is true and the values increase from the end of the array to the beginning, the search direction is treated as right to left.
-- The array may have unset indices as long as every set index is in order.
-- Items may be objects - set the relevant parameter of `ValueProp`, `ValueKey`, or `ValueCallback`.
-- The point at which the binary search stops is calculated using this relationship:
- - `R * 0.5 ** (Z + 1) * S <= H`
-  - R Is the range `IndexEnd - IndexStart + 1`.
-  - Z is the unknown variable found to satisfy the relationship, which becomes the `StopBinary` value.
-  - S is an approximation of the number of operations required to search 1 index sequentially (14).
-  - H is an approximation of the number of operations required to halve the range (27).
- - This relationship assumes each operation is atomic. Passing a value to a function is counted as an operation.
+The point at which the binary search stops is calculated using this relationship:
+- `R * 0.5 ** (Z + 1) * S <= H`
+- R Is the range `IndexEnd - IndexStart + 1`.
+- Z is the unknown variable found to satisfy the relationship, which becomes the `StopBinary` value.
+- S is an approximation of the number of operations required to search 1 index sequentially (14).
+- H is an approximation of the number of operations required to halve the range (27).
+- This relationship assumes each operation is atomic. Passing a value to a function is counted as an operation.
 
 ## Contents
+Please retrieve the files from the repository.
 
-### QuickFind.ahk
+### !QuickFind.ahk
 Contains the code for the `QuickFind` class.
 
-### Test_QuickFind.ahk
+### !Test_QuickFind.ahk
 A comprehensive validation test for `QuickFind`.
-
-### Debug_QuickFind.ahk
-A debug version of `QuickFind`, intended to be used with `Test_QuickFind.ahk` (don't forget to change the #Include statement).
 
 ### QuickFind_CharExample.ahk
 Demonstrates how to use `QuickFind` to search for a word in an array sorted alphabetically.
 
-### Words.ahk
-Contains an array of words sorted alphabetically.
+### !Words.ahk
+Contains an array of words sorted alphabetically, for testing QuickFind_CharExample.ahk.
