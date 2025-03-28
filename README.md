@@ -155,11 +155,11 @@ Performs a binary search on an array to find one or more indices that contain th
 ## Implementation Details
 The point at which the binary search stops is calculated using this relationship:
 - `R * 0.5 ** (Z + 1) * S <= H`
-- R Is the range `IndexEnd - IndexStart + 1`.
-- Z is the unknown variable found to satisfy the relationship, which becomes the `StopBinary` value.
-- S is an approximation of the number of operations required to search 1 index sequentially (14).
-- H is an approximation of the number of operations required to halve the range (27).
-- This relationship assumes each operation is atomic. Passing a value to a function is counted as an operation.
+  - R Is the range `IndexEnd - IndexStart + 1`.
+  - Z is the unknown variable found to satisfy the relationship, which becomes the `StopBinary` value.
+  - S is an approximation of the number of operations required to search 1 index sequentially (14).
+  - H is an approximation of the number of operations required to halve the range (27).
+  - This relationship assumes each operation is atomic. Passing a value to a function is counted as an operation.
 
 ## Contents
 
