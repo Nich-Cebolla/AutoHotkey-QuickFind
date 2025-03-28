@@ -79,7 +79,9 @@ AccessorFuncBetter(Item, *) {
 - {Integer} - The index of the first value that satisfies the condition.
 
 ## QuickFind.Func - Details
+
 Added V1.1.0
+
 - The array does not need to have the same values in it each time the function is called, but these conditions must be true for the function to return the expected result:
   - The array must be sorted in the same direction as it was when the function object was created.
   - The array cannot be a shorter length than `IndexEnd`.
@@ -122,7 +124,9 @@ The function parameters are:
 - {VarRef} [OutValue] - A variable that will receive the value at the found index.
 
 ## QuickFind.Equality - Details
+
 Added V1.2.0
+
 Performs a binary search on an array to find one or more indices that contain the input value. This function has these characteristics:
 - The array is assumed to be in order of value.
 - The array may have unset indices as long as every set index is in order.
