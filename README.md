@@ -171,6 +171,8 @@ Demonstrates how to use `QuickFind` to search for a word in an array sorted alph
 ### Words.ahk
 Contains an array of words sorted alphabetically, for testing QuickFind_CharExample.ahk.
 
+### Changelog
+
 2025-03-27 - V1.2.0
 - Breaking changes
   - The parameters for `QuickFind` have been simplified.
