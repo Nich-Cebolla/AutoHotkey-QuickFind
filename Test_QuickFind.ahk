@@ -24,7 +24,7 @@ class Test_QuickFind {
     static Options := {
         FontOpt: 'S11 Q5'
       , FontStandard: 'Roboto'
-      , FontMono: 'Roboto Mono'
+      , FontMono: ['Mono', 'Roboto Mono']
     }
 
     static Paused := 0
@@ -33,11 +33,14 @@ class Test_QuickFind {
     , Finished := 0
 
     static __New() {
-        FindIndices := this.FindIndices := [1, 2, 3, 4, 5, 9, 10, 11, 250, 499, 500, 501, 989, 990, 991
-        , 994, 995, 996, 998, 999, 1000]
+        FindIndices := this.FindIndices := [1, 2, 3, 4, 5, 9, 10, 11, 250, 499, 500, 501, 989, 990
+        , 991, 994, 995, 996, 998, 999, 1000]
         StartIndices := [1, 100, 500, 900, 999]
+        ; Offsets get added to the start indices to get the end indices.
         Offsets := [1, 2, 4, 5, 99, 100, 499, 500, 997, 998, 999]
         this.Len := 1000
+        ; `Bounds` contains the actual start and end indices, each as an object with `{ Start, End }`
+        ; properties.
         this.Bounds := []
         this.Bounds.Capacity := FindIndices.Length * Offsets.Length
         i := k := 0
@@ -51,13 +54,13 @@ class Test_QuickFind {
             k := 0
         }
         this.Bounds.Capacity := this.Bounds.Length
+        ; First test array ascends, second test array descends.
         this.TestArrays := [[], []]
         _ProcessTestArray(-500, 1, this.TestArrays[1])
         _ProcessTestArray(500, -1, this.TestArrays[2])
         this.Functions := []
 
         return
-
 
         _ProcessTestArray(StartValue, Direction, TestArr) {
             k := 1
@@ -497,7 +500,7 @@ class Test_QuickFind {
 
         for Ctrl in G {
             if Ctrl.Type == 'Edit' {
-                Ctrl.SetFont(, Opt.FontMono)
+                this.SetFonts(Ctrl, Opt.FontMono)
             }
         }
 
@@ -692,32 +695,35 @@ class Test_QuickFind {
         f.Close()
     }
     static LaunchEqualToTester() {
+        local a, MG, EG
         EG := Gui('-DPIScale +Resize')
-        EG.a := []
-        EG.SetFont('s11', 'roboto mono')
-        EG.add('Text', 'section vTxtInfo', 'To make a test array, enter in the start value (the value'
-        ' that`r`nwill be at index 1) and the length of the array (each index`r`nwill increment in value by 1).')
-        EG.add('Edit', 'xs Section w70 vMakeStartValue', '1')
-        EG.add('Edit', 'ys w70 vMakeLength', '1000')
-        EG.add('Button', 'ys vbtnmake', 'Make').OnEvent('Click', HClickButtonMake)
-        EG.add('Text', 'section xs vTxtParameters', 'Parameters:')
-        EG.Add('Button', 'ys vtest', 'Test').onevent('click', HClickButtonTest)
-        EG.add('Text', 'section xs vTxtIndexStart', 'IndexStart:')
-        EG.add('Edit', 'ys w70 vIndexStart', '1')
-        EG.add('Text', 'ys vTxtIndexEnd', 'IndexEnd:')
-        EG.add('Edit', 'ys w70 vIndexEnd', '1000')
-        EG.add('Text', 'xs section vTxtFind', 'Find:')
-        EG.add('Edit', 'ys w70 vFind', '500')
-        EG.add('Text', 'ys vTxtResult', 'Result:')
+        a := EG.a := []
+        this.SetFonts(EG, this.Options.FontMono)
+        EG.Add('Text', 'section +Wrap w600 vTxtInfo', 'To make a test array, enter in the start value (the value'
+        ' that will be at index 1), the length of the array, and the increment step.')
+        EG.Add('Text', 'xs Section vTxtStartValue', 'Start value:')
+        EG.Add('Edit', 'ys w70 vMakeStartValue', '1')
+        EG.Add('Text', 'ys vTxtLength', 'Length:')
+        EG.Add('Edit', 'ys w70 vMakeLength', '1000')
+        EG.Add('Text', 'ys vTxtStep', 'Step:')
+        EG.Add('Edit', 'ys w70 vMakeStep', '1')
+        EG.Add('Button', 'ys vbtnmake', 'Make').OnEvent('Click', HClickButtonMake)
+        EG.Add('Text', 'section xs vTxtParameters', 'Parameters:')
+        EG.Add('Button', 'ys vtest', 'Test').onevent('Click', HClickButtonTest)
+        EG.Add('Text', 'section xs vTxtIndexStart', 'IndexStart:')
+        EG.Add('Edit', 'ys w70 vIndexStart', '1')
+        EG.Add('Text', 'ys vTxtIndexEnd', 'IndexEnd:')
+        EG.Add('Edit', 'ys w70 vIndexEnd', '1000')
+        EG.Add('Text', 'xs section vTxtFind', 'Find:')
+        EG.Add('Edit', 'ys w70 vFind', '500')
+        EG.Add('Text', 'ys vTxtResult', 'Result:')
         EG.Add('Edit', 'ys w400 vResult')
-        EG.Add('Text', 'xs Section vTxtSetIndices', 'Write a list of ``index,value`` pairs to update the indices.')
-        EG.add('Edit', 'xs section w200 vSetIndices')
-        EG.add('Button', 'ys vBtnSetIndices', 'Set indices').Onevent('click', HClickButtonSetIndices)
-        ; EG.add('Button', 'xs section vModifyArray', 'Modify array').OnEvent('click', HClickButtonModifyArray)
+        EG.Add('Button', 'xs section vModifyArray', 'Modify array').OnEvent('Click', HClickButtonModifyArray)
         EG.show()
         EG['Result'].Setfont('s10')
 
         HClickButtonTest(*) {
+            _Save()
             if !EG.HasOwnProp('a') || !EG.a.Length {
                 if EG['MakeStartValue'].Text && EG['MakeLength'].Text {
                     HClickButtonMake()
@@ -730,58 +736,158 @@ class Test_QuickFind {
             EG['Result'].Text := 'Found index: ' Result '; Last index: ' (LastIndex??'')
             this.ShowTooltip('Done!')
         }
-        ; HClickButtonModifyArray(*) {
-        ;     MG := Gui('-DPIScale +Resize')
-        ;     MG.SetFont('s10', 'roboto mono')
-        ;     mg.Add('Button', 'Section vbtnprevious', 'Previous').OnEvent('click', hclickbuttonprevious)
-        ;     mg.Add('Button', 'ys vbtnnext', 'Next').OnEvent('click', hclickbuttonnext)
-        ;     mg.Add('Button', 'ys vbtnpage1', 'Save').OnEvent('click', hclickbuttonsave)
-        ;     mg.Add('Edit', 'section w400 ve1')
-        ;     loop 19 {
-        ;         mg.Add('Edit', 'xs w400 ve' A_Index + 1)
-        ;     }
 
-
-        ;     _Page(n) {
-        ;         loop 20 {
-        ;             MG['e' A_Index].Text := ''
-        ;         }
-        ;         if EG.a.length {
-        ;             k := 0
-        ;             i := 500 * (n - 1)
-        ;             loop 20 {
-        ;                 e := MG['e' A_Index]
-        ;                 k++
-        ;                 loop 50 {
-        ;                     if EG.a.Length < i {
-        ;                         break
-        ;                     }
-        ;                     e.Text .= EG.a[++i] ','
-        ;                 }
-        ;             }
-        ;         }
-        ;     }
-        ; }
-        HClickButtonSetIndices(*) {
-            split := StrSplit(EG['setindices'].Text, ',', '`s`t')
-            loop split.length / 2 {
-                if split[A_Index * 2] = 'unset' {
-                    EG.a.Delete(split[A_Index * 2 - 1])
-                } else {
-                    EG.a[split[A_Index * 2 - 1]] :=  split[A_Index * 2]
+        HClickButtonModifyArray(*) {
+            Flag := 1
+            if EG.HasOwnProp('MG') {
+                try {
+                    EG.MG.Show()
+                    Flag := 0
                 }
             }
-            this.ShowTooltip('Set!')
+            if Flag {
+                EG.MG := MG := Gui('-DPIScale +Resize')
+                MG.Index := 1
+                MG.SetFont('S11 Q5')
+                this.SetFonts(MG, this.Options.FontMono)
+                MG.Add('Button', 'Section vBtnPrevious', 'Previous').OnEvent('Click', HClickButtonPrevious)
+                MG.Add('Edit', 'ys w70 vEditJump')
+                MG.Add('Text', 'ys vTxtOf', 'of')
+                MG.Add('Text', 'ys w40 vTxtTotal', '0')
+                MG.Add('Button', 'ys vBtnJump', 'Jump').OnEvent('Click', HClickButtonJump)
+                MG.Add('Button', 'ys vBtnNext', 'Next').OnEvent('Click', HClickButtonNext)
+                MG.Add('Button', 'ys vBtnSave', 'Save').OnEvent('Click', HClickButtonSave)
+                Align.CenterV(MG['TxtOf'], MG['BtnPrevious'])
+                Align.CenterV(MG['TxtTotal'], MG['BtnPrevious'])
+                Align.CenterV(MG['EditJump'], MG['BtnPrevious'])
+                MG.SetFont('S10 Q5', this.Options.FontStandard)
+                MG['BtnPrevious'].GetPos(, &cy, , &ch)
+                X := MG.MarginX
+                Y := cy + ch + MG.MarginY + 20
+                N := 1
+                this.SetFonts(MG, this.Options.FontMono)
+                loop 5 {
+                    if A_Index == 1 {
+                        MG.Add('Text', Format('x{} y{} Section vt{}', X, Y + 4, A_Index * 3 - 2), '0000').GetPos(, , &width, &ch1)
+                        MG['t1'].Text := _Fill('1')
+                    } else {
+                        MG.Add('Text', Format('x{} y{} w{} Section vt{}', X, Y + 4, width, A_Index * 3 - 2), _Fill(N)).GetPos(, , , &ch1)
+                    }
+                    MG.Add('Edit', Format('x{} y{} w70 r20 -VScroll ve{}', X + width + 10, Y- 4, A_Index)).GetPos(&cx2, &cy2, &cw2, &ch2)
+                    N += 9
+                    MG.Add('Text', Format('x{} y{} w{} vt{}', X, cy2 + 0.5 * ch2 - ch1, width, A_Index * 3 - 1), _Fill(N))
+                    N += 10
+                    MG.Add('Text', Format('x{} y{} w{} vt{}', X, cy2 + ch2 - ch1 - 5, width, A_Index * 3), _Fill(N))
+                    N += 1
+                    X += MG.MarginX * 2 + cw2 + width
+                }
+                EG.GetPos(&gx, &gy, &gw, )
+                Hmon := DllCall('User32.dll\MonitorFromWindow', 'Ptr', EG.Hwnd, 'UInt', 0x00000000, 'UPtr')
+                MonitorInfo := Buffer(40, 0)
+                NumPut('Uint', 40, MonitorInfo)
+                if DllCall('user32\GetMonitorInfo', 'Ptr', Hmon, 'Ptr', MonitorInfo) {
+                    L := NumGet(MonitorInfo, 0, 'Int')
+                    R := NumGet(MonitorInfo, 8, 'Int')
+                    X := gx - L > R - gx - gw ? L + 100 : gx + gw + 100
+                    MG.Show('x' X ' y' Y)
+                } else {
+                    MG.Show()
+                }
+                _UpdateMG()
+            }
+        }
+        _Fill(Str) {
+            loop 4 - StrLen(Str) {
+                s .= ' '
+            }
+            return s Str
+        }
+        HClickButtonPrevious(*) {
+            _SetIndex(-1)
+        }
+
+        HClickButtonJump(*) {
+            _SetIndex(, MG['EditJump'].Text)
+        }
+
+        HClickButtonNext(*) {
+            _SetIndex(1)
+        }
+
+        HClickButtonSave(*) {
+            _Save()
+            MG.Hide()
         }
         HClickButtonMake(*) {
-            EG.a := []
-            n := number(EG['MakeStartValue'].Text)
-            EG.a.capacity := EG['MakeLength'].Text
-            loop EG.a.capacity {
-                EG.a.push(n++)
+            a := EG.a := []
+            n := Number(EG['MakeStartValue'].Text)
+            Step := Number(EG['MakeStep'].Text)
+            EG.a.Capacity := EG['MakeLength'].Text
+            loop a.Capacity {
+                a.push(n)
+                n += Step
             }
-            EG['IndexEnd'].Text := EG.a.length
+            EG['IndexEnd'].Text := EG.a.Length
+            if EG.HasOwnProp('MG') {
+                try {
+                    _UpdateMG()
+                }
+            }
             this.ShowTooltip('Created!')
+        }
+        _Save() {
+            if !a.Length {
+                this.ShowTooltip('First make an array!.')
+                return
+            }
+            i := (MG.Index - 1) * 100
+            loop 5 {
+                for n in StrSplit(MG['e' A_Index].Text, '`r`n') {
+                    a[++i] := n
+                }
+            }
+        }
+        _SetIndex(dx?, n?) {
+            if !a.Length {
+                this.ShowTooltip('First make an array!.')
+                return
+            }
+            _Save()
+            pgs := a.Length / 100
+            if IsSet(dx) {
+                n := MG.Index + dx
+            } else if !IsSet(n) {
+                throw Error('No set value was provided.')
+            }
+            if n <= 0 {
+                MG.Index := pgs - n
+            } else if n > pgs {
+                MG.Index := n - pgs
+            } else {
+                MG.Index := n
+            }
+            _UpdateMG()
+        }
+        _UpdateMG() {
+            if !a.Length {
+                this.ShowTooltip('First make an array!.')
+                return
+            }
+            i := (MG.Index - 1) * 100
+            MG['EditJump'].Text := MG.Index
+            MG['TxtTotal'].Text := Round(a.Length / 100, 0)
+            N := i + 1
+            loop 5 {
+                Str := ''
+                loop 20 {
+                    Str .= (A_Index == 1 ? '' : '`r`n') a[++i]
+                }
+                MG['e' A_Index].Text := Str
+                MG['t' (A_Index * 3 - 2)].Text := _Fill(N)
+                MG['t' (A_Index * 3 - 1)].Text := _Fill(N += 9)
+                MG['t' (A_Index * 3)].Text := _Fill(N += 10)
+                N += 1
+            }
         }
     }
 
@@ -835,6 +941,11 @@ class Test_QuickFind {
             Str .= Format('{:5}', k) ' : ' ArrCopyObj.Arr[A_Index] '`r`n'
         }
         this.G['Array'].Text := Trim(Str, '`r`n')
+    }
+    static SetFonts(GuiOrCtrl, FontList) {
+        for Font in FontList {
+            GuiOrCtrl.SetFont(, Font)
+        }
     }
     static ShowTooltip(Str) {
         static N := [1,2,3,4,5,6,7]
