@@ -677,7 +677,7 @@ class QuickFind {
         AccessorFunc(Item, *) {
             return Item.prop
         }
-        MsgBox(QuickFind(MyArr, 22, , , , , AccessorFunc)) ; 2
+        MsgBox(QuickFind.Equality(MyArr, 22, , , , AccessorFunc)) ; 2
      * @
      * - The search direction is always left-to-right. If there are multiple indices with the
      * input value, the index returned by the function will be the lowest index, and the index
