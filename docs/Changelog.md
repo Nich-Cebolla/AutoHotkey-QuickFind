@@ -1,3 +1,10 @@
+2025-04-06 - V1.2.1
+- Breaking changes
+  - For optimization reasons, `QuickFind.GetWordValue` has been split into two functions. `QuickFind.GetWordValue` now never uses the cache, and `QuickFind.GetWordValueUseCache` can be used if the cache is wanted. I also noticed a minor optimization opportunity within the function block, so I updated that as well. Anyone who uses this function in another script will need to remove the `UseCache` parameter from the function call.
+- `Test_QuickFind.ahk` has been improved:
+  - The test is no longer tied to the Gui. It can be ran independently from the Gui by calling `Test_QuickFind()`. See the parameter hints for further details.
+  - There is now a debug mode which can be enabled by setting `Test_QuickFind.Debug := true`. It allows for handling of problems individually as they arise.
+
 2025-03-27 - V1.2.0
 - Breaking changes
   - The parameters for `QuickFind` have been simplified.

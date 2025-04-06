@@ -149,7 +149,6 @@ Performs a binary search on an array to find one or more indices that contain th
 
 ## Limitations
 - The array is assumed to be in order of value.
-- The test script is currently tied to the Gui, and so cannot (easily) be included as part of an automated validation process.
 - `QuickFind.Equality` does not have an associated `QuickFind.Func.Equality`. The initialization overhead for `QuickFind.Equality` is quite a bit less compared to `QuickFind.Call`, so it's not a major loss, but is still not ideal.
 
 ## Implementation Details
@@ -176,6 +175,13 @@ Demonstrates how to use `QuickFind` to search for a word in an array sorted alph
 Contains an array of words sorted alphabetically, for testing QuickFind_CharExample.ahk.
 
 ### Changelog
+
+2025-04-06 - V1.2.1
+- Breaking changes
+  - For optimization reasons, `QuickFind.GetWordValue` has been split into two functions. `QuickFind.GetWordValue` now never uses the cache, and `QuickFind.GetWordValueUseCache` can be used if the cache is wanted. I also noticed a minor optimization opportunity within the function block, so I updated that as well. Anyone who uses this function in another script will need to remove the `UseCache` parameter from the function call.
+- `Test_QuickFind.ahk` has been improved:
+  - The test is no longer tied to the Gui. It can be ran independently from the Gui by calling `Test_QuickFind()`. See the parameter hints for further details.
+  - There is now a debug mode which can be enabled by setting `Test_QuickFind.Debug := true`. It allows for handling of problems individually as they arise.
 
 2025-03-27 - V1.2.0
 - Breaking changes
