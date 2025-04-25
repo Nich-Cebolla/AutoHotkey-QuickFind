@@ -1,29 +1,29 @@
 [color=#800000][size=165][b]Description[/b][/size][/color]
-[color=#000000][size=125]An AutoHotkey (AHK) implementation of a binary search.[/size][/color]
+[color=#000000]An AutoHotkey (AHK) implementation of a binary search.[/color]
 
-[color=#000000][size=125]This function performs a binary search on a sorted array, returning the index of the target value if found, or an empty string if not found. A binary search is when you split a range in half repeatedly to narrow in on an input value.[/size][/color]
+[color=#000000]This function performs a binary search on a sorted array, returning the index of the target value if found, or an empty string if not found. A binary search is when you split a range in half repeatedly to narrow in on an input value.[/color]
 
-[color=#000000][size=125]A binary search is optimal when there is little information known about the value that is being searched for and the distribution of values in the array, as this will, on average, require much less processing time to identify the needed value compared to a sequential search.[/size][/color]
+[color=#000000]A binary search is optimal when there is little information known about the value that is being searched for and the distribution of values in the array, as this will, on average, require much less processing time to identify the needed value compared to a sequential search.[/color]
 
-[color=#000000][size=125]Within the file [c]QuickFind_CharExample.ahk[/c] you will find an example of how to use [c]QuickFind[/c] to search for a word in an array sorted alphabetically.[/size][/color]
+[color=#000000]Within the file [c]QuickFind_CharExample.ahk[/c] you will find an example of how to use [c]QuickFind[/c] to search for a word in an array sorted alphabetically.[/color]
 
 [color=#800000][size=150][b]V1.1.0:[/b][/size][/color]
-[color=#000000][size=125]The function has been changed to a class. Nothing has changed about the [c]QuickFind[/c] function itself; it is still called from [c]QuickFind()[/c].[/size][/color]
+[color=#000000]The function has been changed to a class. Nothing has changed about the [c]QuickFind[/c] function itself; it is still called from [c]QuickFind()[/c].[/color]
 
-[color=#000000][size=125]Added [c]QuickFind.Func()[/c] which initializes the needed values that are initialized at the start of [c]QuickFind[/c], then returns a closure that can be called repeadly to search the input array. This will perform slightly better compared to calling [c]QuickFind[/c] multiple times for the same input array.[/size][/color]
+[color=#000000]Added [c]QuickFind.Func()[/c] which initializes the needed values that are initialized at the start of [c]QuickFind[/c], then returns a closure that can be called repeadly to search the input array. This will perform slightly better compared to calling [c]QuickFind[/c] multiple times for the same input array.[/color]
 
 [color=#800000][size=150][b]V1.2.0[/b][/size][/color]
-[color=#000000][size=125]Added [c]QuickFind.Equality[/c]. [c]QuickFind.Equality[/c] performs a binary search with only an equality condition.[/size][/color]
+[color=#000000]Added [c]QuickFind.Equality[/c]. [c]QuickFind.Equality[/c] performs a binary search with only an equality condition.[/color]
 
-[color=#000000][size=125][c]Test_QuickFind.ahk[/c] has been completely reworked and now features a helpful Gui that can be used for debugging. It requires two dependencies which are linked in the file.[/size][/color]
+[color=#000000][c]Test_QuickFind.ahk[/c] has been completely reworked and now features a helpful Gui that can be used for debugging. It requires two dependencies which are linked in the file.[/color]
 
 [color=#800000][size=165][b]Github link[/b][/size][/color]
-[size=125]https://github.com/Nich-Cebolla/AutoHotkey-QuickFind[/size]
+https://github.com/Nich-Cebolla/AutoHotkey-QuickFind
 
 [color=#800000][size=165][b]QuickFind - Details[/b][/size][/color]
-[list][*][color=#000000][size=125]The array is assumed to be in order of value.[/size][/color]
-[*][color=#000000][size=125]The array may have unset indices as long as every set index is in order.[/size][/color]
-[*][color=#000000][size=125]Items may be objects - set [c]ValueCallback[/c] to return the item value.[/size][/color][/list]
+[list][*][color=#000000]The array is assumed to be in order of value.[/color]
+[*][color=#000000]The array may have unset indices as long as every set index is in order.[/color]
+[*][color=#000000]Items may be objects - set [c]ValueCallback[/c] to return the item value.[/color][/list]
 
 [code]
 MyArr := [ { prop: 1 }, { prop: 22 }, { prop: 1776 } ]
@@ -33,26 +33,26 @@ AccessorFunc(Item, *) {
 MsgBox(QuickFind(MyArr, 22, , , , , AccessorFunc)) ; 2
 [/code]
 
-[list][*][color=#000000][size=125][c]QuickFind[/c] determines the search direction internally to allow you to make a decision based on whether you want to find the next greatest or next lowest value. If search direction is relevant to your script or function, the direction is defined as:[/size][/color]
-[*][indent=2][color=#000000][size=125]When [c]Condition[/c] is ">" or ">=", the search direction is the the same as the direction of ascent (the search direction is the same as the direction values increase).[/size][/color][/indent]
-[*][indent=2][color=#000000][size=125]When [c]Condition[/c] is "<" or "<=", the search direction is the inverse of the direction of ascent (the search direction is the same as the direction values decrease).[/size][/color][/indent]
-[*][indent=2][color=#000000][size=125]If every set index within the array contains the same value, and that value satisfies the condition, and at least one set index falls between [c]IndexStart[/c] and [c]IndexEnd[/c], then the function defaults to returning the first set index between [c]IndexStart[/c] and [c]IndexEnd[/c] from left-to-right.[/size][/color][/indent][/list]
+[list][*][color=#000000][c]QuickFind[/c] determines the search direction internally to allow you to make a decision based on whether you want to find the next greatest or next lowest value. If search direction is relevant to your script or function, the direction is defined as:[/color]
+[*][indent=2][color=#000000]When [c]Condition[/c] is ">" or ">=", the search direction is the the same as the direction of ascent (the search direction is the same as the direction values increase).[/color][/indent]
+[*][indent=2][color=#000000]When [c]Condition[/c] is "<" or "<=", the search direction is the inverse of the direction of ascent (the search direction is the same as the direction values decrease).[/color][/indent]
+[*][indent=2][color=#000000]If every set index within the array contains the same value, and that value satisfies the condition, and at least one set index falls between [c]IndexStart[/c] and [c]IndexEnd[/c], then the function defaults to returning the first set index between [c]IndexStart[/c] and [c]IndexEnd[/c] from left-to-right.[/color][/indent][/list]
 
 [color=#800000][size=140][b]Parameters[/b][/size][/color]
-[list][*][size=112][color=#008000][b]{Array}[/color] Arr[/b] - The array to search.[/size]
-[*][size=112][color=#008000][b]{Number|Object}[/color] Value[/b] - The value to search for. This value may be an object as long as its numerical value can be returned by the [c]ValueCallback[/c] function. This is not required to be an object when the items in the array are objects; it can be either an object or number. If [c]ValueCallback[/c] accepts more than just the object as a parameter ({@link QuickFind.Call~ValueCallback}) then it is recommended to pass [c]Value[/c] as a number, or make the second and third parameters of the callback optional.[/size]
-[*][size=112][color=#008000][b]{VarRef}[/color] [OutValue][/b] - A variable that will receive the value at the found index.[/size]
-[*][size=112][color=#008000][b]{String}[/color] [Condition='>='][/b] - The inequality symbol indicating what condition satisfies the search. Valid values are:
+[list][*][color=#008000][b]{Array}[/color] Arr[/b] - The array to search.
+[*][color=#008000][b]{Number|Object}[/color] Value[/b] - The value to search for. This value may be an object as long as its numerical value can be returned by the [c]ValueCallback[/c] function. This is not required to be an object when the items in the array are objects; it can be either an object or number. If [c]ValueCallback[/c] accepts more than just the object as a parameter ({@link QuickFind.Call~ValueCallback}) then it is recommended to pass [c]Value[/c] as a number, or make the second and third parameters of the callback optional.
+[*][color=#008000][b]{VarRef}[/color] [OutValue][/b] - A variable that will receive the value at the found index.
+[*][color=#008000][b]{String}[/color] [Condition='>='][/b] - The inequality symbol indicating what condition satisfies the search. Valid values are:
   - ">": [c]QuickFind[/c] returns the index of the first value greater than the input value.
   - ">=": [c]QuickFind[/c] returns the index of the first value greater than or equal to the input value.
   - "<": [c]QuickFind[/c] returns the index of the first value less than the input value.
-  - "<=": [c]QuickFind[/c] returns the index of the first value less than or equal to the input value.[/size]
-[*][size=112][color=#008000][b]{Number}[/color] [IndexStart=1][/b] - The index to start the search at.[/size]
-[*][size=112][color=#008000][b]{Number}[/color] [IndexEnd][/b] - The index to end the search at. If not provided, the length of the array is used.[/size]
-[*][size=112][color=#008000][b]{Func}[/color] [ValueCallback][/b] - A function that returns the item's numeric value. The function can accept up to three parameters, in this order. If not using one of the parameters, be sure to include the necessary [c]*[/c] symbol to avoid a runtime error.
+  - "<=": [c]QuickFind[/c] returns the index of the first value less than or equal to the input value.
+[*][color=#008000][b]{Number}[/color] [IndexStart=1][/b] - The index to start the search at.
+[*][color=#008000][b]{Number}[/color] [IndexEnd][/b] - The index to end the search at. If not provided, the length of the array is used.
+[*][color=#008000][b]{Func}[/color] [ValueCallback][/b] - A function that returns the item's numeric value. The function can accept up to three parameters, in this order. If not using one of the parameters, be sure to include the necessary [c]*[/c] symbol to avoid a runtime error.
   - The current item being evaluated.
   - The item's index.
-  - The input array.[/size][/list]
+  - The input array.[/list]
 
 [code]
 ; Assume for some reason I have an array that, on the odd indices contains an item with a
@@ -78,18 +78,18 @@ AccessorFuncBetter(Item, *) {
 [/code]
 
 [color=#800000][size=140][b]Returns[/b][/size][/color]
-[list][*][size=112][color=#008000][b]{Integer}[/color][/b] - The index of the first value that satisfies the condition.[/size][/list]
+[list][*][color=#008000][b]{Integer}[/color][/b] - The index of the first value that satisfies the condition.[/list]
 
 [color=#800000][size=165][b]QuickFind.Func - Details[/b][/size][/color]
-[color=#000000][size=125]Added V1.1.0[/size][/color]
-[list][*][color=#000000][size=125]The array does not need to have the same values in it each time the function is called, but these conditions must be true for the function to return the expected result:[/size][/color]
-[*][indent=2][color=#000000][size=125]The array must be sorted in the same direction as it was when the function object was created.[/size][/color][/indent]
-[*][indent=2][color=#000000][size=125]The array cannot be a shorter length than [c]IndexEnd[/c].[/size][/color][/indent]
-[*][indent=2][color=#000000][size=125]The array could be longer than [c]IndexEnd[/c], but any values past [c]IndexEnd[/c] are ignored.[/size][/color][/indent]
-[*][color=#000000][size=125]The reference count for the input array is incremented by 1. If you need to dispose the array, you will have to call [c]Dispose[/c] on this object to get rid of that reference. Calling the function after [c]Dispose[/c] results in an error.[/size][/color]
-[*][color=#000000][size=125]The function parameters are:[/size][/color]
-[*][indent=2][color=#000000][size=125][b]Value[/b] - The value to search for.[/size][/color][/indent]
-[*][indent=2][color=#000000][size=125][b]OutValue[/b] - A variable that will receive the value at the found index.[/size][/color][/indent][/list]
+[color=#000000]Added V1.1.0[/color]
+[list][*][color=#000000]The array does not need to have the same values in it each time the function is called, but these conditions must be true for the function to return the expected result:[/color]
+[*][indent=2][color=#000000]The array must be sorted in the same direction as it was when the function object was created.[/color][/indent]
+[*][indent=2][color=#000000]The array cannot be a shorter length than [c]IndexEnd[/c].[/color][/indent]
+[*][indent=2][color=#000000]The array could be longer than [c]IndexEnd[/c], but any values past [c]IndexEnd[/c] are ignored.[/color][/indent]
+[*][color=#000000]The reference count for the input array is incremented by 1. If you need to dispose the array, you will have to call [c]Dispose[/c] on this object to get rid of that reference. Calling the function after [c]Dispose[/c] results in an error.[/color]
+[*][color=#000000]The function parameters are:[/color]
+[*][indent=2][color=#000000][b]Value[/b] - The value to search for.[/color][/indent]
+[*][indent=2][color=#000000][b]OutValue[/b] - A variable that will receive the value at the found index.[/color][/indent][/list]
 
 [code]
 Arr := [1, 5, 12, 19, 44, 101, 209, 209, 230, 1991]
@@ -104,33 +104,33 @@ Index := Finder(44, &Value) ; Error: This object has been disposed.
 [/code]
 
 [color=#800000][size=140][b]Parameters[/b][/size][/color]
-[list][*][size=112][color=#008000][b]{Array}[/color] Arr[/b] - The array to search.[/size]
-[*][size=112][color=#008000][b]{String}[/color] [Condition='>='][/b] - The inequality symbol indicating what condition satisfies the search. Valid values are:
+[list][*][color=#008000][b]{Array}[/color] Arr[/b] - The array to search.
+[*][color=#008000][b]{String}[/color] [Condition='>='][/b] - The inequality symbol indicating what condition satisfies the search. Valid values are:
   - ">": [c]QuickFind[/c] returns the index of the first value greater than the input value.
   - ">=": [c]QuickFind[/c] returns the index of the first value greater than or equal to the input value.
   - "<": [c]QuickFind[/c] returns the index of the first value less than the input value.
-  - "<=": [c]QuickFind[/c] returns the index of the first value less than or equal to the input value.[/size]
-[*][size=112][color=#008000][b]{Number}[/color] [IndexStart=1][/b] - The index to start the search at.[/size]
-[*][size=112][color=#008000][b]{Number}[/color] [IndexEnd][/b] - The index to end the search at. If not provided, the length of the array is used.[/size]
-[*][size=112][color=#008000][b]{Func}[/color] [ValueCallback][/b] - A function that returns the item's numeric value. The function can accept up to three parameters, in this order. If not using one of the parameters, be sure to include the necessary [c]*[/c] symbol to avoid a runtime error.
+  - "<=": [c]QuickFind[/c] returns the index of the first value less than or equal to the input value.
+[*][color=#008000][b]{Number}[/color] [IndexStart=1][/b] - The index to start the search at.
+[*][color=#008000][b]{Number}[/color] [IndexEnd][/b] - The index to end the search at. If not provided, the length of the array is used.
+[*][color=#008000][b]{Func}[/color] [ValueCallback][/b] - A function that returns the item's numeric value. The function can accept up to three parameters, in this order. If not using one of the parameters, be sure to include the necessary [c]*[/c] symbol to avoid a runtime error.
   - The current item being evaluated.
   - The item's index.
-  - The input array.[/size][/list]
+  - The input array.[/list]
 
 [color=#800000][size=140][b]Returns[/b][/size][/color]
-[list][*][size=112][color=#008000][b]{QuickFind.Func}[/color][/b] - The function object.[/size][/list]
+[list][*][color=#008000][b]{QuickFind.Func}[/color][/b] - The function object.[/list]
 
-[color=#000000][size=125]The function parameters are:[/size][/color]
-[list][*][size=112][color=#008000][b]{Number|Object}[/color] Value[/b] - The value to search for.[/size]
-[*][size=112][color=#008000][b]{VarRef}[/color] [OutValue][/b] - A variable that will receive the value at the found index.[/size][/list]
+[color=#000000]The function parameters are:[/color]
+[list][*][color=#008000][b]{Number|Object}[/color] Value[/b] - The value to search for.
+[*][color=#008000][b]{VarRef}[/color] [OutValue][/b] - A variable that will receive the value at the found index.[/list]
 
 [color=#800000][size=165][b]QuickFind.Equality - Details[/b][/size][/color]
-[color=#000000][size=125]Added V1.2.0
-Performs a binary search on an array to find one or more indices that contain the input value. This function has these characteristics:[/size][/color]
-[list][*][color=#000000][size=125]The array is assumed to be in order of value.[/size][/color]
-[*][color=#000000][size=125]The array may have unset indices as long as every set index is in order.[/size][/color]
-[*][color=#000000][size=125]Items may be objects - set [c]ValueCallback[/c] to return the item value.[/size][/color]
-[*][color=#000000][size=125]The search direction is always left-to-right. If there are multiple indices with the input value, the index returned by the function will be the lowest index, and the index assigned to [c]OutLastIndex[/c] will be the highest index.[/size][/color][/list]
+[color=#000000]Added V1.2.0
+Performs a binary search on an array to find one or more indices that contain the input value. This function has these characteristics:[/color]
+[list][*][color=#000000]The array is assumed to be in order of value.[/color]
+[*][color=#000000]The array may have unset indices as long as every set index is in order.[/color]
+[*][color=#000000]Items may be objects - set [c]ValueCallback[/c] to return the item value.[/color]
+[*][color=#000000]The search direction is always left-to-right. If there are multiple indices with the input value, the index returned by the function will be the lowest index, and the index assigned to [c]OutLastIndex[/c] will be the highest index.[/color][/list]
 
 [code]
 MyArr := [ { Year: 2001 }, { Year: 2001 }, { Year: 2001 }, { Year: 2001 }, { Year: 2002 }, { Year: 2003 } ]
@@ -143,102 +143,123 @@ MsgBox(LastIndex) ; 4
 [/code]
 
 [color=#800000][size=140][b]Parameters[/b][/size][/color]
-[list][*][size=112][color=#008000][b]{Array}[/color] Arr[/b] - The array to search.[/size]
-[*][size=112][color=#008000][b]{Number|Object}[/color] Value[/b] - The value to search for. This value may be an object as long as its numerical value can be returned by the [c]ValueCallback[/c] function. This is not required to be an object when the items in the array are objects; it can be either an object or number.[/size]
-[*][size=112][color=#008000][b]{VarRef}[/color] [OutLastIndex][/b] - If there are multiple indices containing the input value, [c]QuickFind.Equality[/c] assigns to this variable the last index which contains the input value. If there is one index containing the input value, [c]OutLastIndex[/c] will be the same as the return value.[/size]
-[*][size=112][color=#008000][b]{Number}[/color] [IndexStart=1][/b] - The index to start the search at.[/size]
-[*][size=112][color=#008000][b]{Number}[/color] [IndexEnd][/b] - The index to end the search at. If not provided, the length of the array is used.[/size]
-[*][size=112][color=#008000][b]{Func}[/color] [ValueCallback][/b] - The function that returns the item's numeric value. The function can accept up to three parameters, in this order:
+[list][*][color=#008000][b]{Array}[/color] Arr[/b] - The array to search.
+[*][color=#008000][b]{Number|Object}[/color] Value[/b] - The value to search for. This value may be an object as long as its numerical value can be returned by the [c]ValueCallback[/c] function. This is not required to be an object when the items in the array are objects; it can be either an object or number.
+[*][color=#008000][b]{VarRef}[/color] [OutLastIndex][/b] - If there are multiple indices containing the input value, [c]QuickFind.Equality[/c] assigns to this variable the last index which contains the input value. If there is one index containing the input value, [c]OutLastIndex[/c] will be the same as the return value.
+[*][color=#008000][b]{Number}[/color] [IndexStart=1][/b] - The index to start the search at.
+[*][color=#008000][b]{Number}[/color] [IndexEnd][/b] - The index to end the search at. If not provided, the length of the array is used.
+[*][color=#008000][b]{Func}[/color] [ValueCallback][/b] - The function that returns the item's numeric value. The function can accept up to three parameters, in this order:
   - The current item being evaluated.
   - The item's index.
-  - The input array.[/size][/list]
+  - The input array.[/list]
 
 [color=#800000][size=140][b]Returns[/b][/size][/color]
-[list][*][size=112][color=#008000][b]{Integer}[/color][/b] - The index of the first value that satisfies the condition.[/size][/list]
+[list][*][color=#008000][b]{Integer}[/color][/b] - The index of the first value that satisfies the condition.[/list]
 
 [color=#800000][size=165][b]Limitations[/b][/size][/color]
-[list][*][color=#000000][size=125]The array is assumed to be in order of value.[/size][/color]
-[*][color=#000000][size=125]The test script is currently tied to the Gui, and so cannot (easily) be included as part of an automated validation process.[/size][/color]
-[*][color=#000000][size=125][c]QuickFind.Equality[/c] does not have an associated [c]QuickFind.Func.Equality[/c]. The initialization overhead for [c]QuickFind.Equality[/c] is quite a bit less compared to [c]QuickFind.Call[/c], so it's not a major loss, but is still not ideal.[/size][/color][/list]
+[list][*][color=#000000]The array is assumed to be in order of value.[/color]
+[*][color=#000000][c]QuickFind.Equality[/c] does not have an associated [c]QuickFind.Func.Equality[/c]. The initialization overhead for [c]QuickFind.Equality[/c] is quite a bit less compared to [c]QuickFind.Call[/c], so it's not a major loss, but is still not ideal.[/color][/list]
 
 [color=#800000][size=165][b]Implementation Details[/b][/size][/color]
-[color=#000000][size=125]The point at which the binary search stops is calculated using this relationship:[/size][/color]
-[list][*][color=#000000][size=125][c]R * 0.5 ** (Z + 1) * S <= H[/c][/size][/color]
-[*][color=#000000][size=125]R Is the range [c]IndexEnd - IndexStart + 1[/c].[/size][/color]
-[*][color=#000000][size=125]Z is the unknown variable found to satisfy the relationship, which becomes the [c]StopBinary[/c] value.[/size][/color]
-[*][color=#000000][size=125]S is an approximation of the number of operations required to search 1 index sequentially (14).[/size][/color]
-[*][color=#000000][size=125]H is an approximation of the number of operations required to halve the range (27).[/size][/color]
-[*][color=#000000][size=125]This relationship assumes each operation is atomic. Passing a value to a function is counted as an operation.[/size][/color][/list]
+[color=#000000]The point at which the binary search stops is calculated using this relationship:[/color]
+[list][*][color=#000000][c]R * 0.5 ** (Z + 1) * S <= H[/c][/color]
+[*][color=#000000]R Is the range [c]IndexEnd - IndexStart + 1[/c].[/color]
+[*][color=#000000]Z is the unknown variable found to satisfy the relationship, which becomes the [c]StopBinary[/c] value.[/color]
+[*][color=#000000]S is an approximation of the number of operations required to search 1 index sequentially (14).[/color]
+[*][color=#000000]H is an approximation of the number of operations required to halve the range (27).[/color]
+[*][color=#000000]This relationship assumes each operation is atomic. Passing a value to a function is counted as an operation.[/color][/list]
 
 [color=#800000][size=165][b]Contents[/b][/size][/color]
-[color=#000000][size=125]Please retrieve the files from the repository.[/size][/color]
+[color=#000000]Please retrieve the files from the repository.[/color]
 
 [color=#800000][size=150][b]QuickFind.ahk[/b][/size][/color]
-[color=#000000][size=125]Contains the code for the [c]QuickFind[/c] class.[/size][/color]
+[color=#000000]Contains the code for the [c]QuickFind[/c] class.[/color]
 
 [color=#800000][size=150][b]Test_QuickFind.ahk[/b][/size][/color]
-[color=#000000][size=125]A comprehensive validation test for [c]QuickFind[/c].[/size][/color]
+[color=#000000]A comprehensive validation test for [c]QuickFind[/c].[/color]
 
 [color=#800000][size=150][b]QuickFind_CharExample.ahk[/b][/size][/color]
-[color=#000000][size=125]Demonstrates how to use [c]QuickFind[/c] to search for a word in an array sorted alphabetically.[/size][/color]
+[color=#000000]Demonstrates how to use [c]QuickFind[/c] to search for a word in an array sorted alphabetically.[/color]
 [code]
 #Include QuickFind.ahk
 #Include Words.ahk
 
-GetWordValue := ObjBindMethod(QuickFind, 'GetWordValue', true) ; true to use cache
-; or
-; GetWordValue := ObjBindMethod(QuickFind, 'GetWordValue', false) ; false to not use cache
+GetWordValue := ObjBindMethod(QuickFind, 'GetWordValueUseCache') ; To use cache
+; GetWordValue := ObjBindMethod(QuickFind, 'GetWordValue') ; No cache
 
 Index := QuickFind(Words, GetWordValue('coincide'), &WordValue, , , , GetWordValue)
 MsgBox('Index: ' Index ' Value: ' WordValue) ; Index: 86 Value: coincide
 Index := QuickFind(Words, GetWordValue('counter'), &WordValue, '>=', , , GetWordValue)
 MsgBox('Index: ' Index ' Value: ' WordValue) ; Index: 110 Value: cow
 
+
 /*
 Explanation:
+
 The printable character range is 33 - 126.
 We subtract 32 to drop the range down to 1 - 94.
 Lowercase characters are excluded, which puts { } | and ~ outside the range. An extra
 26 must be subtracted from their ordinal values to bring them after the backtick ( ` ) (96).
 The total number of characters in the set is 68.
+
+GetWordValue() {
+    local n := 0
+    for c in StrSplit(StrUpper(SubStr(Word, 1, 10))) {
+        if Ord(c) >= 123
+            n += (Ord(c) - 58) / 68 ** A_Index
+        else
+            n += (Ord(c) - 32) / 68 ** A_Index
+    }
+    return n
+}
 [/code]
 
 [color=#800000][size=150][b]Words.ahk[/b][/size][/color]
-[color=#000000][size=125]Contains an array of words sorted alphabetically, for testing QuickFind_CharExample.ahk.[/size][/color]
+[color=#000000]Contains an array of words sorted alphabetically, for testing QuickFind_CharExample.ahk.[/color]
 
 [color=#800000][size=165]Changelog[/size][/color]
-[color=#000000][size=120][b]2025-03-27 - V1.2.0[/b][/size][/color]
-[color=#000000][size=125]Breaking changes[/size][/color]
-[list][*][indent=2][color=#000000][size=125]The parameters for [c]QuickFind[/c] have been simplified.[/size][/color][/indent]
-[*][indent=2][color=#000000][size=125][c]ValueCallback[/c] now accepts three parameters, [c]Item, Index, Arr[/c].[/size][/color][/list][/indent]
-[color=#000000][size=125]Major updates[/size][/color]
-[list][*][indent=2][color=#000000][size=125]Added [c]QuickFind.Equality[/c]. [c]QuickFind.Equality[/c] performs a binary search with only an equality condition.[/size][/color][/indent]
-[*][indent=2][color=#000000][size=125]Completely reworked the test script. It now features a helpful gui that can be used to debug the function.[/size][/color][/indent]
-[*][indent=2][color=#000000][size=125]Removed [c]Debug_QuickFind.ahk[/c] as it is now replaced by the more useful test gui.[/size][/color][/indent][/list]
-[color=#000000][size=125]Minor updates[/size][/color]
-[list][*][indent=2][color=#000000][size=125]Removed [c]QuickFind.GetWordValueFunc[/c].[/size][/color][/indent]
-[*][indent=2][color=#000000][size=125]Adjusted [c]QuickFind.WordValueCache[/c] to be case insensitive.[/size][/color][/indent]
-[*][indent=2][color=#000000][size=125]Restructured and optimized [c]QuickFind.Func.Call[/c]. It now returns a closure instead of a boundfunc, and is slightly more efficient compared to its predecessor.[/size][/color][/indent]
-[*][indent=2][color=#000000][size=125]Reworked the structure and approach used by [c]QuickFind.Call[/c]. The logic is essentially the same, but how the logic is implemented is more streamlined, easier to understand, and easier to adjust. It also mirrors the approach used by [c]QuickFind.Func.Call[/c], so updating both will be much simpler if needed.[/size][/color][/indent]
-[*][indent=2][color=#000000][size=125]Added in comments explaining the various sections of the functions.[/size][/color][/indent]
-[*][indent=2][color=#000000][size=125]Updated some of the parameter hints.[/size][/color][/indent]
-[*][indent=2][color=#000000][size=125]Added fold regions into the code.[/size][/color][/indent]
-[*][indent=2][color=#000000][size=125]Adapted [c]QuickFind.GetWordValue[/c] to the changes and updated [c]QuickFind_CharExample.ahk[/c]. [/size][/color][/indent][/list]
+[spoiler]
+[color=#000000]2025-04-06 - V1.2.1[/color]
+[color=#000000]Breaking changes[/color]
+[list][*]For optimization reasons, `QuickFind.GetWordValue` has been split into two functions. `QuickFind.GetWordValue` now never uses the cache, and `QuickFind.GetWordValueUseCache` can be used if the cache is wanted. I also noticed a minor optimization opportunity within the function block, so I updated that as well. Anyone who uses this function in another script will need to remove the `UseCache` parameter from the function call.[/list]
+[color=#000000]Minor updates[/color]
+[list][*]`Test_QuickFind.ahk` has been improved:
+[*][indent=2]The test is no longer tied to the Gui. It can be ran independently from the Gui by calling `Test_QuickFind()`. See the parameter hints for further details.[/indent]
+[*][indent=2]There is now a debug mode which can be enabled by setting `Test_QuickFind.Debug := true`. It allows for handling of problems individually as they arise.[/indent][/list]
 
-[color=#000000][size=120][b]
-2025-03-16 - V1.1.0[/b][/size][/color]
-[list][*][color=#000000][size=125]Converted the function into a class. The function can still be called from [c]QuickFind()[/c].[/size][/color]
-[*][color=#000000][size=125]Added static method [c]GetWordValue[/c] which can be called to get a number that can be used for various word sorting operations.[/size][/color]
-[*][color=#000000][size=125]Added static property [c]GetWordValueFunc[/c] which returns a function object for [c]GetWordValue[/c].[/size][/color]
-[*][color=#000000][size=125]Added a nested class [c]QuickFind.Func[/c]. When called, it returns a function object that can be called repeatedly to search an input array.[/size][/color]
-[*][color=#000000][size=125]Updated Test_QuickFind.ahk to allow testing [c]QuickFind.Func[/c].[/size][/color]
-[*][color=#000000][size=125]Updated QuickFind_CharExample.ahk to reflect these changes.[/size][/color][/list]
+[color=#000000][b]2025-03-27 - V1.2.0[/b][/color]
+[color=#000000]Breaking changes[/color]
+[list][*][indent=2][color=#000000]The parameters for [c]QuickFind[/c] have been simplified.[/color][/indent]
+[*][indent=2][color=#000000][c]ValueCallback[/c] now accepts three parameters, [c]Item, Index, Arr[/c].[/color][/list][/indent]
+[color=#000000]Major updates[/color]
+[list][*][indent=2][color=#000000]Added [c]QuickFind.Equality[/c]. [c]QuickFind.Equality[/c] performs a binary search with only an equality condition.[/color][/indent]
+[*][indent=2][color=#000000]Completely reworked the test script. It now features a helpful gui that can be used to debug the function.[/color][/indent]
+[*][indent=2][color=#000000]Removed [c]Debug_QuickFind.ahk[/c] as it is now replaced by the more useful test gui.[/color][/indent][/list]
+[color=#000000]Minor updates[/color]
+[list][*][indent=2][color=#000000]Removed [c]QuickFind.GetWordValueFunc[/c].[/color][/indent]
+[*][indent=2][color=#000000]Adjusted [c]QuickFind.WordValueCache[/c] to be case insensitive.[/color][/indent]
+[*][indent=2][color=#000000]Restructured and optimized [c]QuickFind.Func.Call[/c]. It now returns a closure instead of a boundfunc, and is slightly more efficient compared to its predecessor.[/color][/indent]
+[*][indent=2][color=#000000]Reworked the structure and approach used by [c]QuickFind.Call[/c]. The logic is essentially the same, but how the logic is implemented is more streamlined, easier to understand, and easier to adjust. It also mirrors the approach used by [c]QuickFind.Func.Call[/c], so updating both will be much simpler if needed.[/color][/indent]
+[*][indent=2][color=#000000]Added in comments explaining the various sections of the functions.[/color][/indent]
+[*][indent=2][color=#000000]Updated some of the parameter hints.[/color][/indent]
+[*][indent=2][color=#000000]Added fold regions into the code.[/color][/indent]
+[*][indent=2][color=#000000]Adapted [c]QuickFind.GetWordValue[/c] to the changes and updated [c]QuickFind_CharExample.ahk[/c]. [/color][/indent][/list]
 
-[color=#000000][size=120][b]
-2025-02-23 - V1.0.0[/b][/size][/color]
-[list][*][color=#000000][size=125]Added [c]QuickFind_CharExample.ahk[/c][/size][/color]
-[*][color=#000000][size=125]Standardized what value is received by [c]OutValue[/c]. Previously, I had overlooked this and sometimes it received the unmodified value from the array, and sometimes it received the value after it was processed by [c]GetValue[/c]. Now, it always receives the unmodified value.[/size][/color][/list]
+[color=#000000][b]
+2025-03-16 - V1.1.0[/b][/color]
+[list][*][color=#000000]Converted the function into a class. The function can still be called from [c]QuickFind()[/c].[/color]
+[*][color=#000000]Added static method [c]GetWordValue[/c] which can be called to get a number that can be used for various word sorting operations.[/color]
+[*][color=#000000]Added static property [c]GetWordValueFunc[/c] which returns a function object for [c]GetWordValue[/c].[/color]
+[*][color=#000000]Added a nested class [c]QuickFind.Func[/c]. When called, it returns a function object that can be called repeatedly to search an input array.[/color]
+[*][color=#000000]Updated Test_QuickFind.ahk to allow testing [c]QuickFind.Func[/c].[/color]
+[*][color=#000000]Updated QuickFind_CharExample.ahk to reflect these changes.[/color][/list]
 
-[color=#000000][size=120][b]
-2025-02-16 - V1.0.0[/b][/size][/color]
-[list][*][color=#000000][size=125]Uploaded library[/size][/color][/list]
+[color=#000000][b]
+2025-02-23 - V1.0.0[/b][/color]
+[list][*][color=#000000]Added [c]QuickFind_CharExample.ahk[/c][/color]
+[*][color=#000000]Standardized what value is received by [c]OutValue[/c]. Previously, I had overlooked this and sometimes it received the unmodified value from the array, and sometimes it received the value after it was processed by [c]GetValue[/c]. Now, it always receives the unmodified value.[/color][/list]
+
+[color=#000000][b]
+2025-02-16 - V1.0.0[/b][/color]
+[list][*][color=#000000]Uploaded library[/color][/list]
+[/spoiler]

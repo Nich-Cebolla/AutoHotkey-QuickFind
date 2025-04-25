@@ -988,24 +988,25 @@ class Test_QuickFind {
         this.__UpdateArrayCtrl(ResultObj.Arr)
     }
 
-    static __WriteDebug() {
-        for line in this.Debug.Lines {
-            Str .= line '`r`n'
-        }
-        if !this.Debug.Overwrite && FileExist(this.Debug.File) {
-            switch MsgBox('A file already exists at ' this.Debug.File '.`r`nClick "Yes" to overwrite.'
-            '`r`nClick "No" to append file name with timestamp.'
-            '`r`nClick "Cancel" to exit the thread.'
-            '`r`nTo Disable this message, set ``Test_Quickfind.Debug.FileAction := <1 or 2>``.',, 'YNC') {
-                case 'No': this.Debug.FileAction := 2
-                case 'Cancel':
-            }
-        }
-        f := FileOpen(this.Debug.File, 'w')
-        f.Write(Str)
-        sleep 500
-        f.Close()
-    }
+    ; This isn't implemented, and `this.Debug` is no longer an object. This needs to be completely rewritten
+    ; static __WriteDebug() {
+    ;     for line in this.Debug.Lines {
+    ;         Str .= line '`r`n'
+    ;     }
+    ;     if !this.Debug.Overwrite && FileExist(this.Debug.File) {
+    ;         switch MsgBox('A file already exists at ' this.Debug.File '.`r`nClick "Yes" to overwrite.'
+    ;         '`r`nClick "No" to append file name with timestamp.'
+    ;         '`r`nClick "Cancel" to exit the thread.'
+    ;         '`r`nTo Disable this message, set ``Test_Quickfind.Debug.FileAction := <1 or 2>``.',, 'YNC') {
+    ;             case 'No': this.Debug.FileAction := 2
+    ;             case 'Cancel':
+    ;         }
+    ;     }
+    ;     f := FileOpen(this.Debug.File, 'w')
+    ;     f.Write(Str)
+    ;     sleep 500
+    ;     f.Close()
+    ; }
 
     static __New() {
         FindIndices := this.FindIndices := [1, 2, 3, 4, 5, 9, 10, 11, 250, 499, 500, 501, 989, 990
