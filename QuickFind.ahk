@@ -1,7 +1,7 @@
 /*
     Github: https://github.com/Nich-Cebolla/AutoHotkey-QuickFind
     Author: Nich-Cebolla
-    Version: 1.2.1
+    Version: 1.3.0
     License: MIT
 */
 
@@ -21,11 +21,11 @@ class QuickFind {
      * - The array may have unset indices as long as every set index is in order.
      * - Items may be objects - set `ValueCallback` to return the item value.
      * @example
-        MyArr := [ { prop: 1 }, { prop: 22 }, { prop: 1776 } ]
-        AccessorFunc(Item, *) {
-            return Item.prop
-        }
-        MsgBox(QuickFind(MyArr, 22, , , , , AccessorFunc)) ; 2
+     *  MyArr := [ { prop: 1 }, { prop: 22 }, { prop: 1776 } ]
+     *  AccessorFunc(Item, *) {
+     *      return Item.prop
+     *  }
+     *  MsgBox(QuickFind(MyArr, 22, , , , , AccessorFunc)) ; 2
      * @
      * - `QuickFind` determines the search direction internally to allow you to make a decision based
      * on whether you want to find the next greatest or next lowest value. If search direction is
@@ -52,7 +52,7 @@ class QuickFind {
      * - ">=": `QuickFind` returns the index of the first value greater than or equal to the input value.
      * - "<": `QuickFind` returns the index of the first value less than the input value.
      * - "<=": `QuickFind` returns the index of the first value less than or equal to the input value.
-     * @param {Number} [IndexStart=1] - The index to start the search at.
+     * @param {Number} [IndexStart = 1] - The index to start the search at.
      * @param {Number} [IndexEnd] - The index to end the search at. If not provided, the length of the
      * array is used.
      * @param {Func} [ValueCallback] - A function that returns the item's numeric value.
@@ -62,26 +62,26 @@ class QuickFind {
      * - The item's index.
      * - The input array.
      * @example
-       ; Assume for some reason I have an array that, on the odd indices contains an item with a
-       ; property `Prop`, and on the even indices contains an item with a key `key`.
-       MyArr := [ { Prop: 1 }, Map('key', 22), { Prop: 55 }, Map('key', 55), { Prop: 1776 } ]
-       ; I don't need the array object for my function to accomplish it's task, so I put `*` to
-       ; ignore that parameter.
-        AccessorFunc(Item, Index, *) {
-            if Mod(Index, 2) {
-                return Item.Prop
-            } else {
-                return Item['key']
-            }
-        }
-        ; I could also accomplish the same thing like this
-        AccessorFuncBetter(Item, *) {
-            if Type(Item) == 'Map' {
-                return Item['key']
-            } else {
-                return Item.Prop
-            }
-        }
+     * ; Assume for some reason I have an array that, on the odd indices contains an item with a
+     * ; property `Prop`, and on the even indices contains an item with a key `key`.
+     * MyArr := [ { Prop: 1 }, Map('key', 22), { Prop: 55 }, Map('key', 55), { Prop: 1776 } ]
+     * ; I don't need the array object for my function to accomplish it's task, so I put `*` to
+     * ; ignore that parameter.
+     *  AccessorFunc(Item, Index, *) {
+     *      if Mod(Index, 2) {
+     *          return Item.Prop
+     *      } else {
+     *          return Item['key']
+     *      }
+     *  }
+     *  ; I could also accomplish the same thing like this
+     *  AccessorFuncBetter(Item, *) {
+     *      if Type(Item) == 'Map' {
+     *          return Item['key']
+     *      } else {
+     *          return Item.Prop
+     *      }
+     *  }
      * @
      * @returns {Integer} - The index of the first value that satisfies the condition.
      */
@@ -314,7 +314,7 @@ class QuickFind {
 
         StopBinary := 0
         R := IndexEnd - IndexStart + 1
-        loop 100 {
+        loop 100 { ; 100 is arbitrary
             if R * 0.5 ** (StopBinary + 1) * 14 <= 27 {
                 break
             }
@@ -582,11 +582,11 @@ class QuickFind {
             ; we must search <DirectionofAscent> (1 in the example) then return 6 when we get to 7.
             /**
              * @example
-                if GT {
-                    HEV_Direction := BaseDirection == 1 ? -1 : 1
-                } else {
-                    HEV_Direction := BaseDirection == 1 ? 1 : -1
-                }
+             *  if GT {
+             *      HEV_Direction := BaseDirection == 1 ? -1 : 1
+             *  } else {
+             *      HEV_Direction := BaseDirection == 1 ? 1 : -1
+             *  }
              * @
              */
             if HEV_Direction > 0 {
@@ -625,11 +625,11 @@ class QuickFind {
             ; we must search <DirectionofAscent> * -1 (-1 in the example) then return 3 when we get to 3.
             /**
              * @example
-                if GT {
-                    HEV_Direction := BaseDirection == 1 ? 1 : -1
-                } else {
-                    HEV_Direction := BaseDirection == 1 ? -1 : 1
-                }
+             *  if GT {
+             *      HEV_Direction := BaseDirection == 1 ? 1 : -1
+             *  } else {
+             *      HEV_Direction := BaseDirection == 1 ? -1 : 1
+             *  }
              * @
              */
             loop HEV_Direction > 0 ? IndexEnd - i + 1 : i {
@@ -670,14 +670,14 @@ class QuickFind {
      * @description - Performs a binary search on an array to find one or more indices that contain
      * the input value. This function has these characteristics:
      * - The array is assumed to be in order of value.
-     * - The array may have unset indices as long as every set index is in order.
+     * - All indices must have a value.
      * - Items may be objects - set `ValueCallback` to return the item value.
      * @example
-        MyArr := [ { prop: 1 }, { prop: 22 }, { prop: 1776 } ]
-        AccessorFunc(Item, *) {
-            return Item.prop
-        }
-        MsgBox(QuickFind.Equality(MyArr, 22, , , , AccessorFunc)) ; 2
+     *  MyArr := [ { prop: 1 }, { prop: 22 }, { prop: 1776 } ]
+     *  AccessorFunc(Item, *) {
+     *      return Item.prop
+     *  }
+     *  MsgBox(QuickFind.Equality(MyArr, 22, , , , AccessorFunc)) ; 2
      * @
      * - The search direction is always left-to-right. If there are multiple indices with the
      * input value, the index returned by the function will be the lowest index, and the index
@@ -686,11 +686,11 @@ class QuickFind {
      * @param {Number|Object} Value - The value to search for. This value may be an object as long
      * as its numerical value can be returned by the `ValueCallback` function. This is not required
      * to be an object when the items in the array are objects; it can be either an object or number.
-     * @param {VarRef} [OutLastIndex] - If there are multiple indices containing the input value,
-     * `QuickFind.Equality` assigns to this variable the last index which contains the input value.
+     * @param {VarRef} [OutLastIndex] -  If there are multiple indices containing the input value,
+     * the function assigns `OutLastIndex` with the greatest index which contains the input value.
      * If there is one index containing the input value, `OutLastIndex` will be the same as the return
      * value.
-     * @param {Number} [IndexStart=1] - The index to start the search at.
+     * @param {Number} [IndexStart = 1] - The index to start the search at.
      * @param {Number} [IndexEnd] - The index to end the search at. If not provided, the length of the
      * array is used.
      * @param {Func} [ValueCallback] - The function that returns the item's numeric value.
@@ -698,10 +698,9 @@ class QuickFind {
      * - The current item being evaluated.
      * - The item's index.
      * - The input array.
-     * @returns {Integer} - The index of the first value that satisfies the condition.
+     * @returns {Integer} - If the value is found, the first index containing the value. Else, 0.
      */
     static Equality(Arr, Value, &OutLastIndex?, IndexStart := 1, IndexEnd?, ValueCallback?) {
-        local i, ItemValue, GetNearest, Result
         if !Arr.Length {
             throw Error('The array is empty.', -1)
         }
@@ -714,7 +713,250 @@ class QuickFind {
         }
         StopBinary := 0
         R := IndexEnd - IndexStart + 1
-        loop 100 {
+        loop 100 { ; 100 is arbitrary
+            if R * 0.5 ** (StopBinary + 1) * 14 <= 27 {
+                break
+            }
+            StopBinary++
+        }
+        if IsSet(ValueCallback) {
+            Compare := _Compare2
+            CompareGT := _CompareGT2
+            if IsObject(Value) {
+                Value := ValueCallback(Value)
+            }
+        } else {
+            Compare := _Compare1
+            CompareGT := _CompareGT1
+        }
+        loop StopBinary {
+            i := IndexEnd - Ceil((IndexEnd - IndexStart) * 0.5)
+            if Compare() {
+                Start := i
+                --i
+                loop i - IndexStart + 1 {
+                    if Compare() {
+                        --i
+                    } else {
+                        break
+                    }
+                }
+                Result := i + 1
+                i := Start + 1
+                loop IndexEnd - i + 1 {
+                    if Compare() {
+                        ++i
+                    } else {
+                        break
+                    }
+                }
+                OutLastIndex := i - 1
+                return Result
+            } else if CompareGT() {
+                IndexStart := i
+            } else {
+                IndexEnd := i
+            }
+        }
+        i := IndexStart
+        loop IndexEnd - i + 1 {
+            if Compare() {
+                Result := OutLastIndex := i
+                break
+            }
+            ++i
+        }
+        ; Value was not found
+        if !IsSet(Result) {
+            return 0
+        }
+        ++i
+        loop IndexEnd - i + 1 {
+            if Compare() {
+                ++i
+            } else {
+                break
+            }
+        }
+        OutLastIndex := i - 1
+        return Result
+
+        _Compare1() => Value == Arr[i]
+        _Compare2() => Value == ValueCallback(Arr[i], i, Arr)
+        _CompareGT1() => Value > Arr[i]
+        _CompareGT2() => Value > ValueCallback(Arr[i], i, Arr)
+    }
+    ;@endregion
+
+
+    ;@region EqualityCallback
+    /**
+     * @description - Performs a binary search on an array to find one or more indices that contain
+     * the input value. This function has these characteristics:
+     * - The array is assumed to be in order of value.
+     * - All indices must have a value.
+     * - Comparisons are made using a callback function.
+     * - The search direction is always left-to-right. If there are multiple indices with the
+     * input value, the index returned by the function will be the lowest index, and the index
+     * assigned to `OutLastIndex` will be the highest index.
+     * @param {Array} Arr - The array to search.
+     * @param {*} Callback - A `Func` or callable object that is called for comparison.
+     *
+     * Parameters:
+     * 1. {Array} The input array.
+     * 2. {Integer} The index to evaluate.
+     *
+     * The function should return a number to one of the following effects:
+     * - If the value is less than zero, it indicates the value being searched for is less than the
+     *   value at the input index.
+     * - If the value is zero, it indicates the value being searched for is equal to the value at the
+     *   input index.
+     * - If the value is greater than zero, it indicates the value being searched for is greater than
+     *   the value at the input index.
+     *
+     * For example, if working with pure numbers, the callback function would look like this:
+     * @example
+     *  ValueToFind := 1000
+     *  cb := Callback.Bind(ValueToFind)
+     *
+     *  Callback(value, arr, i) {
+     *      return value - arr[i]
+     *  }
+     * @
+     * @param {VarRef} [OutLastIndex] -  If there are multiple indices containing the input value,
+     * the function assigns `OutLastIndex` with the greatest index which contains the input value.
+     * If there is one index containing the input value, `OutLastIndex` will be the same as the return
+     * value.
+     * @param {Number} [IndexStart = 1] - The index to start the search at.
+     * @param {Number} [IndexEnd] - The index to end the search at. If not provided, the length of the
+     * array is used.
+     * @returns {Integer} - If the value is found, the first index containing the value. Else, 0.
+     */
+    static EqualityCallback(Arr, Callback, &OutLastIndex?, IndexStart := 1, IndexEnd?) {
+        if !Arr.Length {
+            throw Error('The array is empty.', -1)
+        }
+        if !IsSet(IndexEnd) {
+            IndexEnd := Arr.Length
+        }
+        if IndexEnd <= IndexStart {
+            throw Error('The end index is less than or equal to the start index.'
+            , -1, 'IndexEnd: ' IndexEnd '; IndexStart: ' IndexStart)
+        }
+        StopBinary := 0
+        R := IndexEnd - IndexStart + 1
+        loop 100 { ; 100 is arbitrary
+            if R * 0.5 ** (StopBinary + 1) * 14 <= 27 {
+                break
+            }
+            StopBinary++
+        }
+        loop StopBinary {
+            i := IndexEnd - Ceil((IndexEnd - IndexStart) * 0.5)
+            r := Callback(Arr, i)
+            if r > 0 {
+                IndexStart := i
+            } else if r < 0 {
+                IndexEnd := i
+            } else {
+                Start := i
+                --i
+                loop i - IndexStart + 1 {
+                    if Callback(Arr, i) {
+                        break
+                    } else {
+                        --i
+                    }
+                }
+                Result := i + 1
+                i := Start + 1
+                loop IndexEnd - i + 1 {
+                    if Callback(Arr, i) {
+                        break
+                    } else {
+                        ++i
+                    }
+                }
+                OutLastIndex := i - 1
+                return Result
+            }
+        }
+        i := IndexStart
+        loop IndexEnd - i + 1 {
+            if Callback(Arr, i) {
+                ++i
+            } else {
+                Result := OutLastIndex := i
+                break
+            }
+        }
+        ; Value was not found
+        if !IsSet(Result) {
+            return 0
+        }
+        ++i
+        loop IndexEnd - i + 1 {
+            if Callback(Arr, i) {
+                break
+            } else {
+                ++i
+            }
+        }
+        OutLastIndex := i - 1
+        return Result
+    }
+    ;@endregion
+
+
+    ;@region EqualitySparse
+    /**
+     * @description - Performs a binary search on an array to find one or more indices that contain
+     * the input value. This function has these characteristics:
+     * - The array is assumed to be in order of value.
+     * - The array may have unset indices as long as every set index is in order.
+     * - Items may be objects - set `ValueCallback` to return the item value.
+     * @example
+     *  MyArr := [ { prop: 1 }, { prop: 22 }, { prop: 1776 } ]
+     *  AccessorFunc(Item, *) {
+     *      return Item.prop
+     *  }
+     *  MsgBox(QuickFind.EqualitySparse(MyArr, 22, , , , AccessorFunc)) ; 2
+     * @
+     * - The search direction is always left-to-right. If there are multiple indices with the
+     * input value, the index returned by the function will be the lowest index, and the index
+     * assigned to `OutLastIndex` will be the highest index.
+     * @param {Array} Arr - The array to search.
+     * @param {Number|Object} Value - The value to search for. This value may be an object as long
+     * as its numerical value can be returned by the `ValueCallback` function. This is not required
+     * to be an object when the items in the array are objects; it can be either an object or number.
+     * @param {VarRef} [OutLastIndex] - If there are multiple indices containing the input value,
+     * `QuickFind.Equality` assigns to this variable the last index which contains the input value.
+     * If there is one index containing the input value, `OutLastIndex` will be the same as the return
+     * value.
+     * @param {Number} [IndexStart = 1] - The index to start the search at.
+     * @param {Number} [IndexEnd] - The index to end the search at. If not provided, the length of the
+     * array is used.
+     * @param {Func} [ValueCallback] - The function that returns the item's numeric value.
+     * The function can accept up to three parameters, in this order:
+     * - The current item being evaluated.
+     * - The item's index.
+     * - The input array.
+     * @returns {Integer} - The index of the first value that satisfies the condition.
+     */
+    static EqualitySparse(Arr, Value, &OutLastIndex?, IndexStart := 1, IndexEnd?, ValueCallback?) {
+        if !Arr.Length {
+            throw Error('The array is empty.', -1)
+        }
+        if !IsSet(IndexEnd) {
+            IndexEnd := Arr.Length
+        }
+        if IndexEnd <= IndexStart {
+            throw Error('The end index is less than or equal to the start index.'
+            , -1, 'IndexEnd: ' IndexEnd '; IndexStart: ' IndexStart)
+        }
+        StopBinary := 0
+        R := IndexEnd - IndexStart + 1
+        loop 100 { ; 100 is arbitrary
             if R * 0.5 ** (StopBinary + 1) * 14 <= 27 {
                 break
             }
@@ -812,8 +1054,8 @@ class QuickFind {
      * To use this with `QuickFind`, you want to create a `BoundFunc` using `ObjBindMethod.
      * Here's how:
      * @example
-        GetWordValue := ObjBindMethod(QuickFind, 'GetWordValue')
-        Index := QuickFind(MyArr, 'platypus', , , , GetWordValue)
+     *  GetWordValue := ObjBindMethod(QuickFind, 'GetWordValue')
+     *  Index := QuickFind(MyArr, 'platypus', , , , GetWordValue)
      * @
      * @param {String} Word - The input word.
      * @returns {Float} - A number that can be used for various sorting operations.
@@ -837,8 +1079,8 @@ class QuickFind {
      * is accessible from `QuickFind.WordValueCache`.
      * {@link https://www.autohotkey.com/docs/v2/lib/Map.htm}
      * @example
-        QuickFind.WordValueCache.Clear() ; Clear the cache.
-        QuickFind.WordValueCache.Capacity := 5000 ; Set the cache size to 5000 (items).
+     *  QuickFind.WordValueCache.Clear() ; Clear the cache.
+     *  QuickFind.WordValueCache.Capacity := 5000 ; Set the cache size to 5000 (items).
      * @
      * @param {String} Word - The input word.
      * @returns {Float} - A number that can be used for various sorting operations.
@@ -891,15 +1133,15 @@ class QuickFind {
          *   - **Value** - The value to search for.
          *   - **OutValue** - A variable that will receive the value at the found index.
          * @example
-            Arr := [1, 5, 12, 19, 44, 101, 209, 209, 230, 1991]
-            Finder := QuickFind.Func(Arr)
-            Index := Finder(12, &Value)
-            MsgBox(Index) ; 3
-            MsgBox(Value) ; 12
-            ; Do more work
-            ; When finished
-            Finder.Dispose()
-            Index := Finder(44, &Value) ; Error: This object has been disposed.
+         *  Arr := [1, 5, 12, 19, 44, 101, 209, 209, 230, 1991]
+         *  Finder := QuickFind.Func(Arr)
+         *  Index := Finder(12, &Value)
+         *  MsgBox(Index) ; 3
+         *  MsgBox(Value) ; 12
+         *  ; Do more work
+         *  ; When finished
+         *  Finder.Dispose()
+         *  Index := Finder(44, &Value) ; Error: This object has been disposed.
          * @
          * @param {Array} Arr - The array to search.
          * @param {String} [Condition='>='] - The inequality symbol indicating what condition satisfies
@@ -908,7 +1150,7 @@ class QuickFind {
          * - ">=": `QuickFind` returns the index of the first value greater than or equal to the input value.
          * - "<": `QuickFind` returns the index of the first value less than the input value.
          * - "<=": `QuickFind` returns the index of the first value less than or equal to the input value.
-         * @param {Number} [IndexStart=1] - The index to start the search at.
+         * @param {Number} [IndexStart = 1] - The index to start the search at.
          * @param {Number} [IndexEnd] - The index to end the search at. If not provided, the length of the
          * array is used.
          * @param {Func} [ValueCallback] - A function that returns the item's numeric value.
@@ -918,26 +1160,26 @@ class QuickFind {
          * - The item's index.
          * - The input array.
          * @example
-           ; Assume for some reason I have an array that, on the odd indices contains an item with a
-           ; property `Prop`, and on the even indices contains an item with a key `key`.
-           MyArr := [ { Prop: 1 }, Map('key', 22), { Prop: 55 }, Map('key', 55), { Prop: 1776 } ]
-           ; I don't need the array object for my function to accomplish it's task, so I put `*` to
-           ; ignore that parameter.
-            AccessorFunc(Item, Index, *) {
-                if Mod(Index, 2) {
-                    return Item.Prop
-                } else {
-                    return Item['key']
-                }
-            }
-            ; I could also accomplish the same thing like this
-            AccessorFuncBetter(Item, *) {
-                if Type(Item) == 'Map' {
-                    return Item['key']
-                } else {
-                    return Item.Prop
-                }
-            }
+         * ; Assume for some reason I have an array that, on the odd indices contains an item with a
+         * ; property `Prop`, and on the even indices contains an item with a key `key`.
+         * MyArr := [ { Prop: 1 }, Map('key', 22), { Prop: 55 }, Map('key', 55), { Prop: 1776 } ]
+         * ; I don't need the array object for my function to accomplish it's task, so I put `*` to
+         * ; ignore that parameter.
+         *  AccessorFunc(Item, Index, *) {
+         *      if Mod(Index, 2) {
+         *          return Item.Prop
+         *      } else {
+         *          return Item['key']
+         *      }
+         *  }
+         *  ; I could also accomplish the same thing like this
+         *  AccessorFuncBetter(Item, *) {
+         *      if Type(Item) == 'Map' {
+         *          return Item['key']
+         *      } else {
+         *          return Item.Prop
+         *      }
+         *  }
          * @
          * @returns {Integer} - The index of the first value that satisfies the condition.
          */
@@ -1099,7 +1341,7 @@ class QuickFind {
 
                 StopBinary := 0
                 R := IndexEnd - IndexStart + 1
-                loop 100 {
+                loop 100 { ; 100 is arbitrary
                     if R * 0.5 ** (StopBinary + 1) * 14 <= 27 {
                         break
                     }
@@ -1489,7 +1731,6 @@ class QuickFind {
         }
         ;@endregion
 
-
         ;@region Prototype
         /**
          * @description - Calls `QuickFind` using the preset values. See the parameter descriptions
@@ -1518,6 +1759,186 @@ class QuickFind {
             }
         }
         ;@endregion
+
+
+        ;@region EqualityCallback
+        class EqualityCallback {
+            /**
+             * Constructs a callable object that can be used to repeatedly search an input
+             * array. The function has the following characteristics:
+             * - The array is assumed to be in order of value.
+             * - All indices must have a value.
+             * - Comparisons are made using a callback function.
+             * - The search direction is always left-to-right. If there are multiple indices with the
+             *   input value, the index returned by the function will be the lowest index, and the index
+             *   assigned to `OutLastIndex` will be the highest index.
+             *
+             * @param {Array} Arr - The array to search.
+             * @param {*} Callback - A `Func` or callable object that is called for comparison.
+             *
+             * Parameters:
+             * 1. {*} The value that is to be searched for.
+             * 2. {Array} The input array.
+             * 3. {Integer} The index to evaluate.
+             *
+             * The function should return a number to one of the following effects:
+             * - If the value is less than zero, it indicates the value being searched for is less than the
+             *   value at the input index.
+             * - If the value is zero, it indicates the value being searched for is equal to the value at the
+             *   input index.
+             * - If the value is greater than zero, it indicates the value being searched for is greater than
+             *   the value at the input index.
+             *
+             * For example, if working with pure numbers, the callback function would look like this:
+             * @example
+             *  arr := [1, 2, 3, 4, 5, 5, 5, 6, 7, 8, 9, 10]
+             *  finder := QuickFind.Func.EqualityCallback(arr, Callback)
+             *  result := finder(5, &last)
+             *  OutputDebug(result ' ' last) ; 5 7
+             *
+             *  Callback(value, arr, i) {
+             *      return value - arr[i]
+             *  }
+             * @
+             */
+            __New(Arr, Callback) {
+                this.Arr := Arr
+                this.Callback := Callback
+            }
+            /**
+             * @param {*} Value - The value to find.
+             * @param {VarRef} [OutLastIndex] -  If there are multiple indices containing the input value,
+             * the function assigns `OutLastIndex` with the greatest index which contains the input value.
+             * If there is one index containing the input value, `OutLastIndex` will be the same as
+             * the return value.
+             * @returns {Integer} - If the value is found, the first index containing the value. Else,
+             * 0.
+             */
+            Call(Value, &OutLastIndex?) {
+                Callback := this.Callback.Bind(Value, this.Arr)
+                IndexEnd := this.Arr.Length
+                IndexStart := 1
+                StopBinary := 0
+                R := IndexEnd - IndexStart + 1
+                loop 100 { ; 100 is arbitrary
+                    if R * 0.5 ** (StopBinary + 1) * 14 <= 27 {
+                        break
+                    }
+                    StopBinary++
+                }
+                loop StopBinary {
+                    i := IndexEnd - Ceil((IndexEnd - IndexStart) * 0.5)
+                    r := Callback(i)
+                    if r > 0 {
+                        IndexStart := i
+                    } else if r < 0 {
+                        IndexEnd := i
+                    } else {
+                        Start := i
+                        --i
+                        loop i - IndexStart + 1 {
+                            if Callback(i) {
+                                break
+                            } else {
+                                --i
+                            }
+                        }
+                        Result := i + 1
+                        i := Start + 1
+                        loop IndexEnd - i + 1 {
+                            if Callback(i) {
+                                break
+                            } else {
+                                ++i
+                            }
+                        }
+                        OutLastIndex := i - 1
+                        return Result
+                    }
+                }
+                i := IndexStart
+                loop IndexEnd - i + 1 {
+                    if Callback(i) {
+                        ++i
+                    } else {
+                        Result := OutLastIndex := i
+                        break
+                    }
+                }
+                ; Value was not found
+                if !IsSet(Result) {
+                    return 0
+                }
+                ++i
+                loop IndexEnd - i + 1 {
+                    if Callback(i) {
+                        break
+                    } else {
+                        ++i
+                    }
+                }
+                OutLastIndex := i - 1
+                return Result
+            }
+            Dispose() {
+                if this.HasOwnProp('Callback') {
+                    this.DeleteProp('Callback')
+                }
+                if this.HasOwnProp('Arr') {
+                    this.DeleteProp('Arr')
+                }
+            }
+            /**
+             * This version of the function does not search for multiple indices; it only finds
+             * the first index from left-to-right that contains the input value.
+             * @param {*} Value - The value to find.
+             * @returns {Integer} - If the value is found, the first index containing the value. Else,
+             * 0.
+             */
+            Find(Value) {
+                Callback := this.Callback.Bind(Value, this.Arr)
+                IndexEnd := this.Arr.Length
+                IndexStart := 1
+                StopBinary := 0
+                R := IndexEnd - IndexStart + 1
+                loop 100 { ; 100 is arbitrary
+                    if R * 0.5 ** (StopBinary + 1) * 14 <= 27 {
+                        break
+                    }
+                    StopBinary++
+                }
+                loop StopBinary {
+                    i := IndexEnd - Ceil((IndexEnd - IndexStart) * 0.5)
+                    r := Callback(i)
+                    if r > 0 {
+                        IndexStart := i
+                    } else if r < 0 {
+                        IndexEnd := i
+                    } else {
+                        Start := i
+                        --i
+                        loop i - IndexStart + 1 {
+                            if Callback(i) {
+                                return i + 1
+                            } else {
+                                --i
+                            }
+                        }
+                    }
+                }
+                i := IndexStart
+                loop IndexEnd - i + 1 {
+                    if Callback(i) {
+                        ++i
+                    } else {
+                        return i
+                    }
+                }
+                return 0
+            }
+        }
+        ;@endregion
+
     }
     ;@endregion
 }

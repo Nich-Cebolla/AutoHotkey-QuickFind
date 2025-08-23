@@ -1,4 +1,6 @@
 
+# QuickFind
+
 ## Description
 An AutoHotkey (AHK) implementation of a binary search.
 
@@ -18,7 +20,16 @@ Added `QuickFind.Equality`. `QuickFind.Equality` performs a binary search with o
 
 `Test_QuickFind.ahk` has been completely reworked and now features a helpful Gui that can be used for debugging. It requires two dependencies which are linked in the file.
 
-### AutoHotkey Forum Link
+### V1.3.0
+Added `QuickFind.EqualitySparse`, which is the original `QuickFind.Equality` renamed.
+
+Added the new `QuickFind.Equality` which does not allow unset indices, and is more efficient than the original `QuickFind.Equality`.
+
+Added `QuickFind.EqualityCallback` which applies the same logic used by `QuickFind.Equality` but uses a callback function for comparison.
+
+Added `QuickFind.Func.EqualityCallback` which constructs a callable object to repeatedly search an input array for a value using a callback function.
+
+## AutoHotkey Forum Link
 https://www.autohotkey.com/boards/viewtopic.php?f=83&t=135897
 
 ## QuickFind - Details
@@ -123,9 +134,9 @@ The function parameters are:
 - {Number|Object} Value - The value to search for.
 - {VarRef} [OutValue] - A variable that will receive the value at the found index.
 
-## QuickFind.Equality - Details
+## QuickFind.EqualitySparse - Details
 
-Added V1.2.0
+Added V1.2.0 (renamed in V1.3.0)
 
 Performs a binary search on an array to find one or more indices that contain the input value. This function has these characteristics:
 - The array is assumed to be in order of value.
@@ -147,9 +158,101 @@ Performs a binary search on an array to find one or more indices that contain th
 #### Returns
 - {Integer} - The index of the first value that satisfies the condition.
 
-## Limitations
+## QuickFind.Equality - Details
+
+Added V1.3.0
+
+Performs a binary search on an array to find one or more indices that contain the input value. This function has these characteristics:
 - The array is assumed to be in order of value.
-- `QuickFind.Equality` does not have an associated `QuickFind.Func.Equality`. The initialization overhead for `QuickFind.Equality` is quite a bit less compared to `QuickFind.Call`, so it's not a major loss, but is still not ideal.
+- All indices must have a value.
+- Items may be objects - set `ValueCallback` to return the item value.
+- The search direction is always left-to-right. If there are multiple indices with the input value, the index returned by the function will be the lowest index, and the index assigned to `OutLastIndex` will be the highest index.
+
+#### Parameters
+- {Array} Arr - The array to search.
+- {Number|Object} Value - The value to search for. This value may be an object as long as its numerical value can be returned by the `ValueCallback` function. This is not required to be an object when the items in the array are objects; it can be either an object or number.
+- {VarRef} [OutLastIndex] - If there are multiple indices containing the input value, `QuickFind.Equality` assigns to this variable the last index which contains the input value. If there is one index containing the input value, `OutLastIndex` will be the same as the return value.
+- {Number} [IndexStart = 1] - The index to start the search at.
+- {Number} [IndexEnd] - The index to end the search at. If not provided, the length of the array is used.
+- {Func} [ValueCallback] - The function that returns the item's numeric value. The function can accept up to three parameters, in this order:
+  - The current item being evaluated.
+  - The item's index.
+  - The input array.
+
+#### Returns
+- {Integer} - The index of the first value that satisfies the condition.
+
+## QuickFind.EqualityCallback - Details
+
+Added V1.3.0
+
+Performs a binary search on an array to find one or more indices that contain the input value. This function has these characteristics:
+- The array is assumed to be in order of value.
+- All indices must have a value.
+- Comparisons are made using a callback function.
+- The search direction is always left-to-right. If there are multiple indices with the input value, the index returned by the function will be the lowest index, and the index assigned to `OutLastIndex` will be the highest index.
+
+#### Parameters
+- {Array} Arr - The array to search.
+- {Number|Object} Callback - A `Func` or callable object that is called for comparison.
+  - Function parameters:
+    1. {Array} The input array.
+    2. {Integer} The index to evaluate.
+  - Function return value:
+    - If the value is less than zero, it indicates the value being searched for is less than the value at the input index.
+    - If the value is zero, it indicates the value being searched for is equal to the value at the input index.
+    - If the value is greater than zero, it indicates the value being searched for is greater than the value at the input index. For example, if working with pure numbers, the callback function would look like this:
+      ```ahk
+      ValueToFind := 1000
+      cb := Callback.Bind(ValueToFind)
+
+      Callback(value, arr, i) {
+          return value - arr[i]
+      }
+      ```
+
+- {VarRef} [OutLastIndex] - If there are multiple indices containing the input value, `QuickFind.Equality` assigns to this variable the last index which contains the input value. If there is one index containing the input value, `OutLastIndex` will be the same as the return value.
+- {Number} [IndexStart = 1] - The index to start the search at.
+- {Number} [IndexEnd] - The index to end the search at. If not provided, the length of the array is used.
+
+#### Returns
+- {Integer} - The index of the first value that satisfies the condition.
+
+## QuickFind.Func.EqualityCallback - Details
+
+Added V1.3.0
+
+Constructs a callable object that can be used to repeatedly search an input
+array. The function has the following characteristics:
+- The array is assumed to be in order of value.
+- All indices must have a value.
+- Comparisons are made using a callback function.
+- The search direction is always left-to-right. If there are multiple indices with the
+  input value, the index returned by the function will be the lowest index, and the index
+  assigned to `OutLastIndex` will be the highest index.
+
+#### Parameters
+
+1. {Array} Arr - The array to search.
+2. {*} Callback - A `Func` or callable object that is called for comparison.
+  - Function parameters:
+    1. {*} The value that is to be searched for.
+    2. {Array} The input array.
+    3. {Integer} The index to evaluate.
+  - Function return value:
+    - If the value is less than zero, it indicates the value being searched for is less than the value at the input index.
+    - If the value is zero, it indicates the value being searched for is equal to the value at the input index.
+    - If the value is greater than zero, it indicates the value being searched for is greater than the value at the input index. For example, if working with pure numbers, the callback function would look like this:
+      ```ahk
+      arr := [1, 2, 3, 4, 5, 5, 5, 6, 7, 8, 9, 10]
+      finder := QuickFind.Func.EqualityCallback(arr, Callback)
+      result := finder(5, &last)
+      OutputDebug(result ' ' last) ; 5 7
+
+      Callback(value, i, arr) {
+          return value - arr[i]
+      }
+      ```
 
 ## Implementation Details
 The point at which the binary search stops is calculated using this relationship:
@@ -160,13 +263,7 @@ The point at which the binary search stops is calculated using this relationship
   - H is an approximation of the number of operations required to halve the range (27).
   - This relationship assumes each operation is atomic. Passing a value to a function is counted as an operation.
 
-## Contents
-
-### QuickFind.ahk
-Contains the code for the `QuickFind` class.
-
-### Test_QuickFind.ahk
-A comprehensive validation test for `QuickFind`.
+## Misc files
 
 ### QuickFind_CharExample.ahk
 Demonstrates how to use `QuickFind` to search for a word in an array sorted alphabetically.
@@ -174,7 +271,20 @@ Demonstrates how to use `QuickFind` to search for a word in an array sorted alph
 ### Words.ahk
 Contains an array of words sorted alphabetically, for testing QuickFind_CharExample.ahk.
 
-### Changelog
+## Changelog
+
+2025-08-22 - V1.3.0
+- Breaking changes
+  - The method `QuickFind.EqualitySparse` is the same as the original `QuickFind.Equality` added in version 1.2; it allows unset indices in the input array. The method `QuickFind.Equality` no longer permits unset indices, and is more efficient than `QuickFind.EqualitySparse`. Code that uses `QuickFind.Equality` with a sparse input array should be modified to call `QuickFind.EqualitySparse` instead.
+- Major updates
+  - Added directory "test".
+  - Renamed Test_QuickFind.ahk to test\test-QuickFind.ahk.
+  - Added file test\test-equality.ahk which contains basic tests for the new functions.
+  - Added file test\run-tests-equality.ahk which runs the tests in test\test-equality.ahk.
+  - Added method `QuickFind.EqualityCallback` which has the same logic as `QuickFind.Equality` but uses a callback function for comparison.
+  - Added class `QuickFind.Func.EqualityCallback` which returns a callable object used to search an array for an input value.
+- Minor updates
+  - Adjusted the formatting of some JSDoc paramter hints.
 
 2025-04-06 - V1.2.1
 - Breaking changes

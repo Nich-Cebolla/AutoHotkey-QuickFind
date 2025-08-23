@@ -1,3 +1,16 @@
+2025-08-22 - V1.3.0
+- Breaking changes
+  - The method `QuickFind.EqualitySparse` is the same as the original `QuickFind.Equality` added in version 1.2; it allows unset indices in the input array. The method `QuickFind.Equality` no longer permits unset indices, and is more efficient than `QuickFind.EqualitySparse`. Code that uses `QuickFind.Equality` with a sparse input array should be modified to call `QuickFind.EqualitySparse` instead.
+- Major updates
+  - Added directory "test".
+  - Renamed Test_QuickFind.ahk to test\test-QuickFind.ahk.
+  - Added file test\test-equality.ahk which contains basic tests for the new functions.
+  - Added file test\run-tests-equality.ahk which runs the tests in test\test-equality.ahk.
+  - Added method `QuickFind.EqualityCallback` which has the same logic as `QuickFind.Equality` but uses a callback function for comparison.
+  - Added class `QuickFind.Func.EqualityCallback` which returns a callable object used to search an array for an input value.
+- Minor updates
+  - Adjusted the formatting of some JSDoc paramter hints.
+
 2025-04-06 - V1.2.1
 - Breaking changes
   - For optimization reasons, `QuickFind.GetWordValue` has been split into two functions. `QuickFind.GetWordValue` now never uses the cache, and `QuickFind.GetWordValueUseCache` can be used if the cache is wanted. I also noticed a minor optimization opportunity within the function block, so I updated that as well. Anyone who uses this function in another script will need to remove the `UseCache` parameter from the function call.
